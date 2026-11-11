@@ -42,10 +42,10 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'store' => fn (): array => [
-                'name' => app(StoreSettings::class)->storeName(),
-                'phone' => app(StoreSettings::class)->storePhone(),
-                'delivery_charge' => app(StoreSettings::class)->defaultDeliveryCharge(),
+            'store' => fn (StoreSettings $settings): array => [
+                'name' => $settings->storeName(),
+                'phone' => $settings->storePhone(),
+                'delivery_charge' => $settings->defaultDeliveryCharge(),
             ],
             'navigation' => Inertia::once(fn (): array => app(CategoryTree::class)->navigation()),
             'bag' => fn (): array => app(CurrentBag::class)->summary(),

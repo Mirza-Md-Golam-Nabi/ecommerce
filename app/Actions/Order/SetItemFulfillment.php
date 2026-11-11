@@ -71,7 +71,7 @@ final class SetItemFulfillment
      */
     private function guardWeight(OrderItem $item, int $grams): void
     {
-        $ordered = $item->quantity * (int) $item->nominal_weight_grams;
+        $ordered = $item->orderedGrams();
 
         if ($grams < 1 || $grams > $ordered * 2) {
             throw ValidationException::withMessages(['amount' => 'ওজন সঠিক নয় — অর্ডারের ওজনের দ্বিগুণের বেশি হতে পারে না।']);

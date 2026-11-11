@@ -44,6 +44,18 @@ final class SalesReport
     }
 
     /**
+     * "মার্জিন 12.5%" for display, or null when there is no revenue.
+     *
+     * @param  Totals  $totals
+     */
+    public static function marginLabel(array $totals): ?string
+    {
+        $margin = self::margin($totals);
+
+        return $margin !== null ? "মার্জিন {$margin}%" : null;
+    }
+
+    /**
      * Totals per day/week/month, including empty periods (for continuous charts).
      *
      * @return list<array<string, int|string>>

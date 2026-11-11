@@ -9,6 +9,7 @@ use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\OrderController;
 use App\Http\Controllers\Storefront\SearchController;
+use App\Rules\UniqueStoreSlug;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,5 +51,5 @@ Route::get('/admin/orders/{order}/invoice', OrderInvoiceController::class)->name
 
 /* Must stay last: flat category/product URLs like /spices or /radhuni-holud-gura-200g. */
 Route::get('/{slug}', [CatalogController::class, 'show'])
-    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->where('slug', UniqueStoreSlug::PATTERN)
     ->name('catalog.show');

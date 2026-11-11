@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests\Storefront;
 
-use App\Support\PhoneNumber;
+use App\Http\Requests\Concerns\NormalizesPhone;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
 {
+    use NormalizesPhone;
+
     public function authorize(): bool
     {
         return true;
@@ -15,7 +17,7 @@ class LoginRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge(['phone' => PhoneNumber::normalize($this->string('phone')->toString()) ?? $this->input('phone')]);
+        $this->normalizePhoneInput();
     }
 
     /**

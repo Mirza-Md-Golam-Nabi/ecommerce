@@ -7,18 +7,16 @@ use App\Actions\Order\SetDeliveryCharge;
 use App\Enums\CancelReason;
 use App\Enums\OrderEventType;
 use App\Enums\OrderStatus;
+use App\Filament\Concerns\RunsOrderActions;
 use App\Filament\Forms\MoneyInput;
 use App\Filament\Resources\Orders\OrderResource;
-use App\Filament\Support\DomainAction;
 use App\Models\Order;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Order processing screen: status buttons follow the lifecycle
@@ -28,6 +26,8 @@ use Illuminate\Support\Facades\Auth;
  */
 class ViewOrder extends ViewRecord
 {
+    use RunsOrderActions;
+
     protected static string $resource = OrderResource::class;
 
     public function getTitle(): string
@@ -51,7 +51,7 @@ class ViewOrder extends ViewRecord
                 ->schema([
                     MoneyInput::make('collected_amount')->label('কত টাকা আদায় হয়েছে')->required(),
                 ])
-                ->action(fn (array $data) => $this->runAndRefresh(
+                ->action(fn (array $data) => $this->runAndReloadOrder($this->record,
                     fn () => app(ChangeOrderStatus::class)->handle($this->record, OrderStatus::Delivered, $this->admin(), collectedAmount: (int) $data['collected_amount']),
                     'ডেলিভারি সম্পন্ন হয়েছে',
                 )),
@@ -65,7 +65,7 @@ class ViewOrder extends ViewRecord
                     Select::make('cancel_reason')->label('কারণ')->options(CancelReason::class)->required(),
                     Textarea::make('note')->label('নোট')->rows(2),
                 ])
-                ->action(fn (array $data) => $this->runAndRefresh(
+                ->action(fn (array $data) => $this->runAndReloadOrder($this->record,
                     fn () => app(ChangeOrderStatus::class)->handle(
                         $this->record,
                         OrderStatus::Cancelled,
@@ -86,7 +86,7 @@ class ViewOrder extends ViewRecord
                         MoneyInput::make('delivery_charge')->label('ডেলিভারি চার্জ')->required(),
                         Textarea::make('note')->label('কারণ (ঐচ্ছিক)')->rows(2),
                     ])
-                    ->action(fn (array $data) => $this->runAndRefresh(
+                    ->action(fn (array $data) => $this->runAndReloadOrder($this->record,
                         fn () => app(SetDeliveryCharge::class)->handle($this->record, (int) $data['delivery_charge'], $this->admin(), $data['note'] ?? null),
                         'ডেলিভারি চার্জ আপডেট হয়েছে',
                     )),
@@ -96,7 +96,7 @@ class ViewOrder extends ViewRecord
                     ->icon(Heroicon::OutlinedPencilSquare)
                     ->fillForm(fn (): array => ['admin_note' => $this->record->admin_note])
                     ->schema([Textarea::make('admin_note')->label('নোট (শুধু অ্যাডমিন দেখবেন)')->rows(3)])
-                    ->action(fn (array $data) => $this->runAndRefresh(function () use ($data): void {
+                    ->action(fn (array $data) => $this->runAndReloadOrder($this->record, function () use ($data): void {
                         $this->record->update(['admin_note' => $data['admin_note']]);
                         $this->record->events()->create([
                             'type' => OrderEventType::NoteAdded,
@@ -123,25 +123,9 @@ class ViewOrder extends ViewRecord
             ->visible(fn (): bool => $this->record->status->canTransitionTo($to))
             ->requiresConfirmation()
             ->modalDescription($confirmation)
-            ->action(fn () => $this->runAndRefresh(
+            ->action(fn () => $this->runAndReloadOrder($this->record,
                 fn () => app(ChangeOrderStatus::class)->handle($this->record, $to, $this->admin()),
                 "অর্ডার এখন: {$to->getLabel()}",
             ));
-    }
-
-    /**
-     * Run a domain action, then reload the page so the infolist and relation managers show fresh data.
-     */
-    private function runAndRefresh(callable $callback, string $successTitle): void
-    {
-        if (DomainAction::run($callback(...), $successTitle)) {
-            $this->redirect(OrderResource::getUrl('view', ['record' => $this->record]));
-        }
-    }
-
-    private function admin(): User
-    {
-        /** @var User */
-        return Auth::user();
     }
 }

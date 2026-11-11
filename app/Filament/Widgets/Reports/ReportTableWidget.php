@@ -2,8 +2,8 @@
 
 namespace App\Filament\Widgets\Reports;
 
+use App\Filament\Tables\MoneyColumn;
 use App\Services\Reports\DateRange;
-use App\Support\Money;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\TableWidget;
@@ -25,10 +25,7 @@ abstract class ReportTableWidget extends TableWidget
 
     protected static function moneyColumn(string $name, string $label): TextColumn
     {
-        return TextColumn::make($name)
-            ->label($label)
-            ->formatStateUsing(fn (mixed $state): string => Money::format((int) $state))
-            ->alignEnd();
+        return MoneyColumn::make($name)->label($label)->alignEnd();
     }
 
     /**

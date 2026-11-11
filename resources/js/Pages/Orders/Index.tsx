@@ -1,5 +1,6 @@
 import { Head, InfiniteScroll, Link } from '@inertiajs/react';
 
+import EmptyState from '@/Components/EmptyState';
 import { ChevronRightIcon } from '@/Components/Icons';
 import OrderStatusBadge from '@/Components/OrderStatusBadge';
 import { formatDateTime, formatMoney, toBanglaDigits } from '@/lib/format';
@@ -12,13 +13,11 @@ export default function OrdersIndex({ orders }: { orders: ScrollData<OrderListIt
             <h1 className="mb-6 text-2xl font-bold text-ink sm:text-3xl">আমার অর্ডার</h1>
 
             {orders.data.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-line bg-card py-16 text-center">
-                    <span className="text-5xl">🧾</span>
-                    <p className="mt-3 text-lg font-semibold text-ink">এখনো কোনো অর্ডার করেননি</p>
-                    <Link href="/" className="mt-4 inline-block rounded-xl bg-primary px-5 py-2.5 font-semibold text-primary-fg">
+                <EmptyState icon="🧾" title="এখনো কোনো অর্ডার করেননি">
+                    <Link href="/" className="inline-block rounded-xl bg-primary px-5 py-2.5 font-semibold text-primary-fg">
                         কেনাকাটা শুরু করুন
                     </Link>
-                </div>
+                </EmptyState>
             ) : (
                 <InfiniteScroll data="orders">
                     <ul className="space-y-3">

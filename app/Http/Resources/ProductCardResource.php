@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Services\Catalog\CategoryTree;
 use App\Settings\StoreSettings;
 use App\Support\Media;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,6 +18,21 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class ProductCardResource extends JsonResource
 {
+    public const PER_PAGE = 24;
+
+    /**
+     * A page of product cards for an infinite-scroll grid (`Inertia::scroll()`).
+     *
+     * @param  Builder<Product>  $query
+     */
+    public static function paginate(Builder $query): Paginator
+    {
+        return $query
+            ->simplePaginate(self::PER_PAGE)
+            ->withQueryString()
+            ->through(fn (Product $product): array => (new self($product))->resolve());
+    }
+
     /**
      * Transform the resource into an array.
      *

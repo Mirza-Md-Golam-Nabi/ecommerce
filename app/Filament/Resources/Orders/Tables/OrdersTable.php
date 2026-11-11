@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
-use App\Enums\CustomerRisk;
+use App\Filament\Tables\CustomerRiskColumn;
+use App\Filament\Tables\MoneyColumn;
 use App\Models\Area;
+use App\Models\Customer;
 use App\Models\Order;
-use App\Support\Money;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
@@ -31,18 +32,14 @@ class OrdersTable
                     ->label('কাস্টমার')
                     ->description(fn (Order $record): string => $record->shipping_phone)
                     ->searchable(['shipping_name', 'shipping_phone']),
-                TextColumn::make('risk')
-                    ->label('ঝুঁকি')
-                    ->state(fn (Order $record): CustomerRisk => CustomerRisk::for($record->customer))
-                    ->badge(),
+                CustomerRiskColumn::make(fn (Order $record): Customer => $record->customer),
                 TextColumn::make('area_name')
                     ->label('এলাকা')
                     ->toggleable(),
                 TextColumn::make('items_count')
                     ->label('পণ্য'),
-                TextColumn::make('grand_total')
+                MoneyColumn::make('grand_total')
                     ->label('মোট')
-                    ->formatStateUsing(fn (int $state): string => Money::format($state))
                     ->sortable(),
                 TextColumn::make('status')
                     ->label('স্ট্যাটাস')

@@ -2,6 +2,8 @@ import { Head, Link, router } from '@inertiajs/react';
 
 import { CheckIcon } from '@/Components/Icons';
 import OrderStatusBadge from '@/Components/OrderStatusBadge';
+import OrderTotals from '@/Components/OrderTotals';
+import { COD_NOTE } from '@/lib/copy';
 import { formatDateTime, formatMoney, formatWeight, toBanglaDigits } from '@/lib/format';
 import type { CustomerOrder } from '@/types';
 
@@ -96,21 +98,13 @@ export default function OrderShow({ order }: { order: CustomerOrder }) {
 
                 <aside className="space-y-4">
                     <div className="rounded-3xl border border-line bg-card p-5 shadow-sm">
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-muted">
-                                <span>পণ্যের দাম</span>
-                                <span className="text-ink">{formatMoney(order.subtotal)}</span>
-                            </div>
-                            <div className="flex justify-between text-muted">
-                                <span>ডেলিভারি চার্জ</span>
-                                <span className="text-ink">{formatMoney(order.delivery_charge)}</span>
-                            </div>
-                            <div className="flex justify-between border-t border-dashed border-line pt-2 text-xl font-bold">
-                                <span>মোট {order.is_estimated && <span className="text-sm font-medium text-muted">(আনুমানিক)</span>}</span>
-                                <span className="text-primary">{formatMoney(order.grand_total)}</span>
-                            </div>
-                        </div>
-                        <p className="mt-3 text-sm text-muted">💵 ক্যাশ অন ডেলিভারি</p>
+                        <OrderTotals
+                            subtotal={order.subtotal}
+                            deliveryCharge={order.delivery_charge}
+                            total={order.grand_total}
+                            isEstimated={order.is_estimated}
+                        />
+                        <p className="mt-3 text-sm text-muted">{COD_NOTE}</p>
                     </div>
 
                     <div className="rounded-3xl border border-line bg-card p-5 shadow-sm">

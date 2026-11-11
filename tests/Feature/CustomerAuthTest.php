@@ -6,10 +6,6 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Services\Cart\CurrentBag;
 
-beforeEach(function () {
-    $this->withoutVite();
-});
-
 it('registers a customer with a normalized phone and logs them in', function () {
     $this->post('/register', [
         'name' => 'রহিম উদ্দিন',

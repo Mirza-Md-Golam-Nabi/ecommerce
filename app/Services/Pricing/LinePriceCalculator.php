@@ -46,7 +46,7 @@ final class LinePriceCalculator
         }
 
         if ($item->isWeighted() && $item->nominal_weight_grams) {
-            $grams = $item->actual_weight_grams ?? $item->quantity * $item->nominal_weight_grams;
+            $grams = $item->actual_weight_grams ?? $item->orderedGrams();
 
             return (int) round($unitAmount * $grams / $item->nominal_weight_grams);
         }

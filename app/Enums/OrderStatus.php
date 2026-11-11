@@ -44,6 +44,16 @@ enum OrderStatus: string implements HasColor, HasLabel
     }
 
     /**
+     * Statuses of orders still in progress (not delivered/cancelled).
+     *
+     * @return list<self>
+     */
+    public static function active(): array
+    {
+        return array_values(array_filter(self::cases(), fn (self $status): bool => ! $status->isFinal()));
+    }
+
+    /**
      * Customers may cancel their own order only while it is pending.
      */
     public function isCancellableByCustomer(): bool

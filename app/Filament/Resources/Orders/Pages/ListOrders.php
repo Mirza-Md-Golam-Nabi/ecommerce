@@ -24,8 +24,8 @@ class ListOrders extends ListRecords
     {
         $tabs = [
             'active' => Tab::make('চলমান')
-                ->badge($this->countLabel(array_map(fn (OrderStatus $status): string => $status->value, $this->activeStatuses())))
-                ->modifyQueryUsing(fn (Builder $query): Builder => $query->whereIn('status', $this->activeStatuses())),
+                ->badge($this->countLabel(array_map(fn (OrderStatus $status): string => $status->value, OrderStatus::active())))
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->whereIn('status', OrderStatus::active())),
         ];
 
         foreach (OrderStatus::cases() as $status) {
@@ -40,14 +40,6 @@ class ListOrders extends ListRecords
     public function getDefaultActiveTab(): string
     {
         return 'active';
-    }
-
-    /**
-     * @return list<OrderStatus>
-     */
-    private function activeStatuses(): array
-    {
-        return array_values(array_filter(OrderStatus::cases(), fn (OrderStatus $status): bool => ! $status->isFinal()));
     }
 
     /**

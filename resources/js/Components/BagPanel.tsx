@@ -4,10 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import AddToBagControl from '@/Components/AddToBagControl';
 import IconButton from '@/Components/IconButton';
 import { BagIcon, CloseIcon, TrashIcon } from '@/Components/Icons';
+import OrderTotals from '@/Components/OrderTotals';
 import ProductImage from '@/Components/ProductImage';
 import { useBag } from '@/contexts/BagContext';
 import { useToast } from '@/contexts/ToastContext';
+import { useModal } from '@/hooks/useModal';
 import { requestJson } from '@/lib/api';
+import { COD_NOTE } from '@/lib/copy';
 import { formatMoney, toBanglaDigits } from '@/lib/format';
 import type { BagDetails } from '@/types';
 
@@ -37,20 +40,7 @@ export default function BagPanel() {
         };
     }, [bag.isOpen, bag.version, toast]);
 
-    useEffect(() => {
-        if (!bag.isOpen) {
-            return;
-        }
-
-        const onKey = (event: KeyboardEvent) => event.key === 'Escape' && bag.close();
-        document.body.style.overflow = 'hidden';
-        window.addEventListener('keydown', onKey);
-
-        return () => {
-            document.body.style.overflow = '';
-            window.removeEventListener('keydown', onKey);
-        };
-    }, [bag.isOpen, bag.close]);
+    useModal(bag.isOpen, bag.close);
 
     const lines = useMemo(
         () => (details?.items ?? []).filter((line) => bag.quantityOf(line.product.id) > 0 || !line.can_be_ordered),
@@ -137,19 +127,7 @@ export default function BagPanel() {
 
                 {bag.count > 0 && (
                     <div className="space-y-2 border-t border-line bg-card p-5">
-                        <div className="flex justify-between text-muted">
-                            <span>পণ্যের দাম</span>
-                            <span className="font-medium text-ink">{formatMoney(bag.subtotal)}</span>
-                        </div>
-                        <div className="flex justify-between text-muted">
-                            <span>ডেলিভারি চার্জ</span>
-                            <span className="font-medium text-ink">{formatMoney(deliveryCharge)}</span>
-                        </div>
-                        <div className="flex justify-between border-t border-dashed border-line pt-2 text-lg font-bold text-ink">
-                            <span>মোট {hasWeighted && <span className="text-sm font-medium text-muted">(আনুমানিক)</span>}</span>
-                            <span className="text-primary">{formatMoney(bag.subtotal + deliveryCharge)}</span>
-                        </div>
-                        {hasWeighted && <p className="text-xs text-muted">ওজনের পণ্যের চূড়ান্ত দাম ডেলিভারির সময় আসল ওজন অনুযায়ী ঠিক হবে।</p>}
+                        <OrderTotals subtotal={bag.subtotal} deliveryCharge={deliveryCharge} total={bag.subtotal + deliveryCharge} isEstimated={hasWeighted} />
                         {bag.subtotal > 0 ? (
                             <Link
                                 href="/checkout"
@@ -161,7 +139,7 @@ export default function BagPanel() {
                         ) : (
                             <p className="mt-2 rounded-xl bg-danger/10 px-3 py-2 text-center text-sm text-danger">অর্ডার করার মতো পণ্য ব্যাগে নেই।</p>
                         )}
-                        <p className="text-center text-xs text-muted">💵 ক্যাশ অন ডেলিভারি — পণ্য হাতে পেয়ে টাকা দিন</p>
+                        <p className="text-center text-xs text-muted">{COD_NOTE}</p>
                     </div>
                 )}
             </aside>

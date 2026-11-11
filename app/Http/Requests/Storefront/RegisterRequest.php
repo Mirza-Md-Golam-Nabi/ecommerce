@@ -2,13 +2,15 @@
 
 namespace App\Http\Requests\Storefront;
 
+use App\Http\Requests\Concerns\NormalizesPhone;
 use App\Rules\BangladeshiPhone;
-use App\Support\PhoneNumber;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
 {
+    use NormalizesPhone;
+
     public function authorize(): bool
     {
         return true;
@@ -16,7 +18,7 @@ class RegisterRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge(['phone' => PhoneNumber::normalize($this->string('phone')->toString()) ?? $this->input('phone')]);
+        $this->normalizePhoneInput();
     }
 
     /**

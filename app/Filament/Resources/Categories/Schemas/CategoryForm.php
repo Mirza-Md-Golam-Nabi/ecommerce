@@ -16,8 +16,6 @@ use Filament\Schemas\Schema;
 
 class CategoryForm
 {
-    public const SLUG_PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
-
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -34,7 +32,7 @@ class CategoryForm
                             ->helperText('ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও ড্যাশ। যেমন: spices → ওয়েবসাইটে /spices')
                             ->required()
                             ->maxLength(120)
-                            ->regex(self::SLUG_PATTERN)
+                            ->regex(UniqueStoreSlug::REGEX)
                             ->rule(fn (?Category $record): UniqueStoreSlug => new UniqueStoreSlug($record)),
                         Select::make('parent_id')
                             ->label('মূল ক্যাটাগরি')

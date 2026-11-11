@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import AddToBagControl from '@/Components/AddToBagControl';
 import { CloseIcon } from '@/Components/Icons';
 import Price from '@/Components/Price';
-import ProductImage from '@/Components/ProductImage';
+import ProductGallery from '@/Components/ProductGallery';
+import WeightedPriceNote from '@/Components/WeightedPriceNote';
 import { useQuickView } from '@/contexts/QuickViewContext';
+import { useModal } from '@/hooks/useModal';
 import { requestJson } from '@/lib/api';
-import { toBanglaDigits } from '@/lib/format';
 import type { ProductDetail } from '@/types';
 
 /**
@@ -17,11 +18,11 @@ import type { ProductDetail } from '@/types';
 export default function QuickViewModal() {
     const { product, close } = useQuickView();
     const [detail, setDetail] = useState<ProductDetail | null>(null);
-    const [activeImage, setActiveImage] = useState(0);
+
+    useModal(product !== null, close);
 
     useEffect(() => {
         setDetail(null);
-        setActiveImage(0);
 
         if (!product) {
             return;
@@ -33,22 +34,14 @@ export default function QuickViewModal() {
             .then((response) => !cancelled && setDetail(response.product))
             .catch(() => undefined);
 
-        const onKey = (event: KeyboardEvent) => event.key === 'Escape' && close();
-        document.body.style.overflow = 'hidden';
-        window.addEventListener('keydown', onKey);
-
         return () => {
             cancelled = true;
-            document.body.style.overflow = '';
-            window.removeEventListener('keydown', onKey);
         };
-    }, [product, close]);
+    }, [product]);
 
     if (!product) {
         return null;
     }
-
-    const images = detail?.images.length ? detail.images : [product.image];
 
     return (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={product.name}>
@@ -65,30 +58,12 @@ export default function QuickViewModal() {
                 </button>
 
                 <div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
-                    <div>
-                        <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-card p-6">
-                            {product.discount_percent ? (
-                                <span className="absolute top-3 left-3 z-10 rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-fg">
-                                    -{toBanglaDigits(product.discount_percent)}%
-                                </span>
-                            ) : null}
-                            <ProductImage src={images[activeImage] ?? null} alt={product.name} placeholderIcon={product.placeholder_icon} />
-                        </div>
-                        {images.length > 1 && (
-                            <div className="mt-3 flex gap-2 overflow-x-auto">
-                                {images.map((image, index) => (
-                                    <button
-                                        key={image ?? index}
-                                        type="button"
-                                        onClick={() => setActiveImage(index)}
-                                        className={`size-16 shrink-0 overflow-hidden rounded-xl border-2 p-1 ${index === activeImage ? 'border-accent' : 'border-line'}`}
-                                    >
-                                        <ProductImage src={image} alt="" />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    <ProductGallery
+                        images={detail?.images.length ? detail.images : [product.image]}
+                        alt={product.name}
+                        placeholderIcon={product.placeholder_icon}
+                        discountPercent={product.discount_percent}
+                    />
 
                     <div className="flex flex-col">
                         <h2 className="pr-10 text-2xl leading-snug font-bold text-ink">{product.name}</h2>
@@ -97,7 +72,9 @@ export default function QuickViewModal() {
                             <Price price={product.price} compareAtPrice={product.compare_at_price} size="lg" />
                         </div>
                         {product.is_weighted && (
-                            <p className="mt-3 rounded-xl bg-accent/15 px-4 py-2 text-sm text-ink">⚖️ চূড়ান্ত দাম ডেলিভারির সময় আসল ওজন অনুযায়ী নির্ধারিত হবে।</p>
+                            <div className="mt-3">
+                                <WeightedPriceNote variant="callout" />
+                            </div>
                         )}
 
                         <div className="mt-6">

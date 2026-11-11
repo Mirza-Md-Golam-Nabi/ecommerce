@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\SaleType;
 use App\Filament\Forms\MoneyInput;
-use App\Filament\Resources\Categories\Schemas\CategoryForm;
 use App\Models\Product;
 use App\Rules\UniqueStoreSlug;
 use App\Services\Catalog\CategoryTree;
@@ -39,7 +38,7 @@ class ProductForm
                             ->helperText('ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও ড্যাশ। প্যাক সাইজও লিখুন।')
                             ->required()
                             ->maxLength(200)
-                            ->regex(CategoryForm::SLUG_PATTERN)
+                            ->regex(UniqueStoreSlug::REGEX)
                             ->rule(fn (?Product $record): UniqueStoreSlug => new UniqueStoreSlug($record)),
                         Select::make('category_id')
                             ->label('ক্যাটাগরি')

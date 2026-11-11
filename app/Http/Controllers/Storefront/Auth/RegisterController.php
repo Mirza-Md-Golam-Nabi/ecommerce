@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Storefront\Auth;
 
-use App\Actions\Cart\MergeGuestBag;
+use App\Actions\Customer\CompleteCustomerLogin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storefront\RegisterRequest;
 use App\Models\Customer;
@@ -19,14 +19,12 @@ class RegisterController extends Controller
         return Inertia::render('Auth/Register');
     }
 
-    public function store(RegisterRequest $request, MergeGuestBag $mergeGuestBag): RedirectResponse
+    public function store(RegisterRequest $request, CompleteCustomerLogin $completeLogin): RedirectResponse
     {
         $customer = Customer::query()->create($request->validated());
 
         Auth::guard('customer')->login($customer, remember: true);
-        $request->session()->regenerate();
-
-        $mergeGuestBag->handle($customer, $request->cookie(CurrentBag::COOKIE));
+        $completeLogin->handle($customer, $request->session(), $request->cookie(CurrentBag::COOKIE));
 
         return redirect()->intended(route('home'))->with('success', 'স্বাগতম! আপনার অ্যাকাউন্ট তৈরি হয়েছে।');
     }

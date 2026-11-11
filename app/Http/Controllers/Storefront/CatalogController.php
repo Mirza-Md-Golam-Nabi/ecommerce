@@ -8,7 +8,6 @@ use App\Http\Resources\ProductDetailResource;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTree;
 use App\Support\Media;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,10 +19,6 @@ use Inertia\Response;
  */
 class CatalogController extends Controller
 {
-    public const PER_PAGE = 24;
-
-    public const SORTS = ['name', 'price_asc', 'price_desc', 'popular'];
-
     public function show(Request $request, string $slug, CategoryTree $tree): Response
     {
         $category = $tree->findBySlug($slug);
@@ -70,6 +65,7 @@ class CatalogController extends Controller
             ], $tree->children($category['id'])),
             'products' => null,
             'sort' => null,
+            'sortOptions' => [],
         ]);
     }
 
@@ -78,17 +74,11 @@ class CatalogController extends Controller
      */
     private function leafCategory(Request $request, array $category, CategoryTree $tree): Response
     {
-        $sort = in_array($request->query('sort'), self::SORTS, true) ? $request->query('sort') : 'name';
+        $sort = array_key_exists((string) $request->query('sort'), Product::SORT_OPTIONS) ? (string) $request->query('sort') : array_key_first(Product::SORT_OPTIONS);
 
-        $query = Product::query()
-            ->active()
-            ->where('category_id', $category['id'])
-            ->orderByDesc('is_available');
-
-        $products = $this->applySort($query, $sort)
-            ->simplePaginate(self::PER_PAGE)
-            ->withQueryString()
-            ->through(fn (Product $product): array => (new ProductCardResource($product))->resolve());
+        $products = ProductCardResource::paginate(
+            Product::query()->active()->where('category_id', $category['id'])->forStorefront($sort),
+        );
 
         return Inertia::render('Category', [
             'category' => $this->categoryData($category),
@@ -96,23 +86,8 @@ class CatalogController extends Controller
             'subcategories' => [],
             'products' => Inertia::scroll($products),
             'sort' => $sort,
+            'sortOptions' => Product::SORT_OPTIONS,
         ]);
-    }
-
-    /**
-     * @param  Builder<Product>  $query
-     * @return Builder<Product>
-     */
-    public static function applySort(Builder $query, string $sort): Builder
-    {
-        $sorted = match ($sort) {
-            'price_asc' => $query->orderBy('price')->orderBy('name'),
-            'price_desc' => $query->orderByDesc('price')->orderBy('name'),
-            'popular' => $query->orderByDesc('total_sold')->orderBy('name'),
-            default => $query->orderBy('name'),
-        };
-
-        return $sorted->orderBy('id');
     }
 
     private function findVisibleProduct(string $slug, CategoryTree $tree): ?Product

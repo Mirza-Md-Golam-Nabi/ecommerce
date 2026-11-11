@@ -4,6 +4,8 @@ namespace App\Filament\Widgets\Reports;
 
 use App\Services\Reports\DateRange;
 use App\Services\Reports\SalesReport;
+use App\Support\Money;
+use App\Support\Theme;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
@@ -40,26 +42,21 @@ class SalesChart extends ChartWidget
      */
     public static function chartData(array $series): array
     {
-        $taka = fn (string $metric): array => array_map(fn (array $row): float => ((int) $row[$metric]) / 100, $series);
+        $colors = Theme::current()->colors;
+
+        $dataset = fn (string $label, string $metric, string $color): array => [
+            'label' => $label,
+            'data' => array_map(fn (array $row): float => Money::toTaka((int) $row[$metric]), $series),
+            'borderColor' => $color,
+            'backgroundColor' => $color.'26',
+            'fill' => true,
+            'tension' => 0.3,
+        ];
 
         return [
             'datasets' => [
-                [
-                    'label' => 'বিক্রি (৳)',
-                    'data' => $taka('revenue'),
-                    'borderColor' => '#0F3D2E',
-                    'backgroundColor' => 'rgba(15, 61, 46, 0.12)',
-                    'fill' => true,
-                    'tension' => 0.3,
-                ],
-                [
-                    'label' => 'লাভ (৳)',
-                    'data' => $taka('gross_profit'),
-                    'borderColor' => '#C9A227',
-                    'backgroundColor' => 'rgba(201, 162, 39, 0.15)',
-                    'fill' => true,
-                    'tension' => 0.3,
-                ],
+                $dataset('বিক্রি (৳)', 'revenue', $colors['primary']),
+                $dataset('লাভ (৳)', 'gross_profit', $colors['accent']),
             ],
             'labels' => array_map(fn (array $row): string => (string) $row['label'], $series),
         ];

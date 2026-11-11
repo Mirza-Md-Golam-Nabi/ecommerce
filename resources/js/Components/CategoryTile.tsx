@@ -3,6 +3,9 @@ import { Link } from '@inertiajs/react';
 import ProductImage from '@/Components/ProductImage';
 import type { CategoryTileData } from '@/types';
 
+/** Responsive grid used wherever category tiles are listed (home, category pages). */
+export const categoryGridClasses = 'grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6';
+
 export default function CategoryTile({ category }: { category: CategoryTileData }) {
     return (
         <Link

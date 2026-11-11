@@ -91,3 +91,6 @@ Model events catch every change path (actions, admin, seeders) without wiring ev
 
 **D-034 — 2026-11-11 — `User` implements `FilamentUser` (`canAccessPanel` → admin panel).**
 Without it Filament blocks every admin outside the local environment — the admin could not log in in production.
+
+**D-035 — 2026-11-11 — Strict DRY: shared logic, markup and constants live in central helpers listed in `docs/07-conventions.md` ("Central helper registry"); backend/frontend shared values are sent from the server as props.**
+Requested by the owner; one place to change behaviour, fewer inconsistencies.

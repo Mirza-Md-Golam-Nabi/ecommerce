@@ -1,9 +1,12 @@
 import { Head } from '@inertiajs/react';
 
+import EmptyState from '@/Components/EmptyState';
 import ProductGrid from '@/Components/ProductGrid';
 import type { ProductCard, ScrollData } from '@/types';
 
 export default function Search({ query, products }: { query: string; products: ScrollData<ProductCard> | null }) {
+    const hasResults = products !== null && products.data.length > 0;
+
     return (
         <>
             <Head title={query ? `"${query}" খোঁজ` : 'খুঁজুন'} />
@@ -18,14 +21,12 @@ export default function Search({ query, products }: { query: string; products: S
                 )}
             </h1>
 
-            {products && products.data.length > 0 && <ProductGrid data="products" products={products.data} />}
-
-            {(!products || products.data.length === 0) && (
-                <div className="rounded-2xl border border-dashed border-line bg-card py-16 text-center">
-                    <span className="text-5xl">🔍</span>
-                    <p className="mt-3 text-lg font-semibold text-ink">{query ? 'কোনো পণ্য পাওয়া যায়নি' : 'উপরের সার্চ বক্সে পণ্যের নাম লিখুন'}</p>
-                    {query && <p className="mt-1 text-muted">অন্য নামে খুঁজে দেখুন — বাংলা বা ইংরেজি, দুটোতেই খোঁজা যায়।</p>}
-                </div>
+            {hasResults ? (
+                <ProductGrid data="products" products={products.data} />
+            ) : query ? (
+                <EmptyState icon="🔍" title="কোনো পণ্য পাওয়া যায়নি" description="অন্য নামে খুঁজে দেখুন — বাংলা বা ইংরেজি, দুটোতেই খোঁজা যায়।" />
+            ) : (
+                <EmptyState icon="🔍" title="উপরের সার্চ বক্সে পণ্যের নাম লিখুন" />
             )}
         </>
     );

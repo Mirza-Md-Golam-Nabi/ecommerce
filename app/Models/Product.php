@@ -47,6 +47,18 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * Storefront sort options (`?sort=` value => label), default first. Sent to the storefront as a prop.
+     *
+     * @var array<string, string>
+     */
+    public const SORT_OPTIONS = [
+        'name' => 'নাম অনুযায়ী',
+        'price_asc' => 'দাম: কম → বেশি',
+        'price_desc' => 'দাম: বেশি → কম',
+        'popular' => 'জনপ্রিয়',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -131,6 +143,26 @@ class Product extends Model
     public function canBeOrdered(): bool
     {
         return $this->is_available && $this->isVisibleInStore();
+    }
+
+    /**
+     * Storefront listing order: available products first, then the chosen sort (see SORT_OPTIONS).
+     *
+     * @param  Builder<Product>  $query
+     */
+    #[Scope]
+    protected function forStorefront(Builder $query, string $sort = 'name'): void
+    {
+        $query->orderByDesc('is_available');
+
+        match ($sort) {
+            'price_asc' => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            'popular' => $query->orderByDesc('total_sold'),
+            default => null,
+        };
+
+        $query->orderBy('name')->orderBy('id');
     }
 
     public function isWeighted(): bool

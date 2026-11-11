@@ -14,7 +14,6 @@ use App\Settings\StoreSettings;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
-    $this->withoutVite();
     app(StoreSettings::class)->save(['default_delivery_charge' => 6000]);
 
     $this->customer = Customer::factory()->create(['name' => 'রহিম', 'phone' => '01712345678']);

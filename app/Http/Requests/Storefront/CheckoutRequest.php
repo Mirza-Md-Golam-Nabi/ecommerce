@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Storefront;
 
+use App\Http\Requests\Concerns\NormalizesPhone;
 use App\Models\Area;
 use App\Rules\BangladeshiPhone;
-use App\Support\PhoneNumber;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,6 +14,8 @@ use Illuminate\Validation\Rule;
  */
 class CheckoutRequest extends FormRequest
 {
+    use NormalizesPhone;
+
     public const OTHER_AREA = 'other';
 
     public function authorize(): bool
@@ -23,10 +25,8 @@ class CheckoutRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'phone' => PhoneNumber::normalize($this->string('phone')->toString()) ?? $this->input('phone'),
-            'area' => (string) $this->input('area', ''),
-        ]);
+        $this->normalizePhoneInput();
+        $this->merge(['area' => (string) $this->input('area', '')]);
     }
 
     /**

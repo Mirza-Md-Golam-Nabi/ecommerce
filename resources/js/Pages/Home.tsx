@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 
-import CategoryTile from '@/Components/CategoryTile';
+import CategoryTile, { categoryGridClasses } from '@/Components/CategoryTile';
 import type { CategoryTileData } from '@/types';
 
 const promises = [
@@ -50,7 +50,7 @@ export default function Home({ categories }: { categories: CategoryTileData[] })
                             <div className="mt-2 h-1 w-16 rounded-full bg-accent" />
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+                    <div className={categoryGridClasses}>
                         {categories.map((category) => (
                             <CategoryTile key={category.id} category={category} />
                         ))}

@@ -5,7 +5,6 @@ use App\Models\Product;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
-    $this->withoutVite();
 
     $this->food = Category::factory()->onHome(2)->create(['name' => 'খাবার', 'slug' => 'food']);
     $this->spices = Category::factory()->childOf($this->food)->create(['name' => 'মসলা', 'slug' => 'spices']);

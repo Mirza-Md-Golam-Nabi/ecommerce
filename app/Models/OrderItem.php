@@ -94,6 +94,14 @@ class OrderItem extends Model
     }
 
     /**
+     * Estimated grams ordered (quantity × nominal unit weight); 0 for fixed-price items.
+     */
+    public function orderedGrams(): int
+    {
+        return $this->quantity * (int) $this->nominal_weight_grams;
+    }
+
+    /**
      * Purchase list: items of confirmed/purchasing orders not yet bought (no actual cost, still pending).
      *
      * @param  Builder<OrderItem>  $query

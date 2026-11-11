@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Storefront\Auth;
 
-use App\Actions\Cart\MergeGuestBag;
+use App\Actions\Customer\CompleteCustomerLogin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storefront\LoginRequest;
 use App\Models\Customer;
@@ -21,19 +21,15 @@ class LoginController extends Controller
         return Inertia::render('Auth/Login');
     }
 
-    public function store(LoginRequest $request, MergeGuestBag $mergeGuestBag): RedirectResponse
+    public function store(LoginRequest $request, CompleteCustomerLogin $completeLogin): RedirectResponse
     {
-        $credentials = $request->only('phone', 'password');
-
-        if (! Auth::guard('customer')->attempt($credentials, $request->boolean('remember', true))) {
+        if (! Auth::guard('customer')->attempt($request->only('phone', 'password'), $request->boolean('remember', true))) {
             throw ValidationException::withMessages(['phone' => 'মোবাইল নম্বর বা পাসওয়ার্ড ভুল।']);
         }
 
-        $request->session()->regenerate();
-
         /** @var Customer $customer */
         $customer = Auth::guard('customer')->user();
-        $mergeGuestBag->handle($customer, $request->cookie(CurrentBag::COOKIE));
+        $completeLogin->handle($customer, $request->session(), $request->cookie(CurrentBag::COOKIE));
 
         return redirect()->intended(route('home'));
     }

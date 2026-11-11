@@ -1,8 +1,8 @@
 import AddToBagControl from '@/Components/AddToBagControl';
+import DiscountBadge from '@/Components/DiscountBadge';
 import Price from '@/Components/Price';
 import ProductImage from '@/Components/ProductImage';
 import { useQuickView } from '@/contexts/QuickViewContext';
-import { toBanglaDigits } from '@/lib/format';
 import type { ProductCard as ProductCardData } from '@/types';
 
 export default function ProductCard({ product }: { product: ProductCardData }) {
@@ -14,11 +14,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
                 product.is_available ? '' : 'opacity-75'
             }`}
         >
-            {product.discount_percent ? (
-                <span className="absolute top-3 left-3 z-10 rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-accent-fg shadow">
-                    -{toBanglaDigits(product.discount_percent)}%
-                </span>
-            ) : null}
+            <DiscountBadge percent={product.discount_percent} />
 
             <button
                 type="button"

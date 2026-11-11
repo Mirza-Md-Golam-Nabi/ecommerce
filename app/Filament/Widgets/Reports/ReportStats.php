@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Reports;
 
+use App\Filament\Support\ProfitColor;
 use App\Services\Reports\DateRange;
 use App\Services\Reports\SalesReport;
 use App\Support\Money;
@@ -23,7 +24,6 @@ class ReportStats extends StatsOverviewWidget
     protected function getStats(): array
     {
         $totals = app(SalesReport::class)->totals(DateRange::fromFilters($this->pageFilters));
-        $margin = SalesReport::margin($totals);
         $estimated = $totals['estimated_cost_orders'] > 0 ? " · {$totals['estimated_cost_orders']}টি অর্ডারের ক্রয়মূল্য আনুমানিক" : '';
         $cancelRate = $totals['orders_placed'] > 0 ? round($totals['orders_cancelled'] * 100 / $totals['orders_placed'], 1) : 0;
         $averageOrder = $totals['orders_delivered'] > 0 ? intdiv($totals['revenue'], $totals['orders_delivered']) : 0;
@@ -33,8 +33,8 @@ class ReportStats extends StatsOverviewWidget
                 ->description('ডেলিভারি চার্জ আলাদা: '.Money::format($totals['delivery_income']))
                 ->color('primary'),
             Stat::make('লাভ', Money::format($totals['gross_profit']))
-                ->description(($margin !== null ? "মার্জিন {$margin}%" : 'এখনো বিক্রি নেই').$estimated)
-                ->color($totals['gross_profit'] >= 0 ? 'success' : 'danger'),
+                ->description((SalesReport::marginLabel($totals) ?? 'এখনো বিক্রি নেই').$estimated)
+                ->color(ProfitColor::for($totals['gross_profit'])),
             Stat::make('অর্ডার', "{$totals['orders_delivered']} / {$totals['orders_placed']}")
                 ->description("ডেলিভারি / মোট অর্ডার · বাতিল {$totals['orders_cancelled']} ({$cancelRate}%)"),
             Stat::make('গড় অর্ডার', Money::format($averageOrder))

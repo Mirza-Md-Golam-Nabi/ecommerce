@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Enums\CustomerRisk;
+use App\Filament\Infolists\MoneyEntry;
+use App\Filament\Support\ProfitColor;
 use App\Models\Order;
 use App\Support\Money;
 use Filament\Infolists\Components\TextEntry;
@@ -13,7 +15,8 @@ class OrderInfolist
 {
     public static function configure(Schema $schema): Schema
     {
-        $money = fn (?int $state): string => Money::format((int) $state);
+        /** Money with an "(আনুমানিক)" suffix until every actual purchase cost is entered. */
+        $costAware = fn (Order $record, int $amount): string => Money::format($amount).($record->cost_is_final ? '' : ' (আনুমানিক)');
 
         return $schema
             ->columns(3)
@@ -27,7 +30,7 @@ class OrderInfolist
                         TextEntry::make('payment_status')->label('পেমেন্ট (COD)')->badge(),
                         TextEntry::make('cancel_reason')->label('বাতিলের কারণ')->badge()->color('danger')
                             ->visible(fn (Order $record): bool => $record->cancel_reason !== null),
-                        TextEntry::make('collected_amount')->label('আদায় হয়েছে')->formatStateUsing($money)
+                        MoneyEntry::make('collected_amount')->label('আদায় হয়েছে')
                             ->visible(fn (Order $record): bool => $record->collected_amount !== null),
                         TextEntry::make('admin_note')->label('অ্যাডমিন নোট')->placeholder('—')->columnSpanFull(),
                     ]),
@@ -52,18 +55,18 @@ class OrderInfolist
 
                 Section::make('হিসাব')
                     ->schema([
-                        TextEntry::make('subtotal')->label('পণ্যের দাম')->formatStateUsing($money),
-                        TextEntry::make('delivery_charge')->label('ডেলিভারি চার্জ')->formatStateUsing($money),
-                        TextEntry::make('grand_total')->label('মোট বিল')->formatStateUsing($money)->weight('bold')->size('lg'),
-                        TextEntry::make('unavailable_total')->label('পাওয়া যায়নি (হারানো বিক্রি)')->formatStateUsing($money)
+                        MoneyEntry::make('subtotal')->label('পণ্যের দাম'),
+                        MoneyEntry::make('delivery_charge')->label('ডেলিভারি চার্জ'),
+                        MoneyEntry::make('grand_total')->label('মোট বিল')->weight('bold')->size('lg'),
+                        MoneyEntry::make('unavailable_total')->label('পাওয়া যায়নি (হারানো বিক্রি)')
                             ->visible(fn (Order $record): bool => $record->unavailable_total > 0)
                             ->color('danger'),
                         TextEntry::make('cost_total')->label('ক্রয়মূল্য')
-                            ->formatStateUsing(fn (Order $record): string => Money::format($record->cost_total).($record->cost_is_final ? '' : ' (আনুমানিক)')),
+                            ->formatStateUsing(fn (Order $record): string => $costAware($record, $record->cost_total)),
                         TextEntry::make('profit')->label('লাভ')
-                            ->state(fn (Order $record): int => $record->subtotal - $record->cost_total)
-                            ->formatStateUsing(fn (Order $record, int $state): string => Money::format($state).($record->cost_is_final ? '' : ' (আনুমানিক)'))
-                            ->color(fn (int $state): string => $state >= 0 ? 'success' : 'danger'),
+                            ->state(fn (Order $record): int => $record->grossProfit())
+                            ->formatStateUsing(fn (Order $record): string => $costAware($record, $record->grossProfit()))
+                            ->color(fn (Order $record): string => ProfitColor::for($record->grossProfit())),
                     ]),
             ]);
     }

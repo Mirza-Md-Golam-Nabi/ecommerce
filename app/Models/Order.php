@@ -145,6 +145,14 @@ class Order extends Model
     }
 
     /**
+     * Product revenue minus purchase cost (delivery charge excluded), poisha. Estimated until cost_is_final.
+     */
+    public function grossProfit(): int
+    {
+        return $this->subtotal - $this->cost_total;
+    }
+
+    /**
      * Items, delivery charge and costs may change only until the order is delivered or cancelled.
      */
     public function isEditable(): bool

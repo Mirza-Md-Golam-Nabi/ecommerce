@@ -32,6 +32,7 @@ class CheckoutController extends Controller
         return Inertia::render('Checkout', [
             'summary' => $details,
             'areas' => Area::query()->active()->get(['id', 'name']),
+            'otherArea' => CheckoutRequest::OTHER_AREA,
             'address' => [
                 'recipient_name' => $address->recipient_name ?? $customer->name,
                 'phone' => $address->phone ?? $customer->phone,

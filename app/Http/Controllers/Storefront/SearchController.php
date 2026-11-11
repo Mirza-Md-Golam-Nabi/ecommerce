@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductCardResource;
-use App\Models\Product;
 use App\Services\Catalog\ProductSearch;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,20 +15,11 @@ class SearchController extends Controller
     {
         $term = trim((string) $request->query('q', ''));
 
-        $products = null;
-
-        if ($term !== '') {
-            $query = $search->query($term)->orderByDesc('is_available');
-
-            $products = CatalogController::applySort($query, 'name')
-                ->simplePaginate(CatalogController::PER_PAGE)
-                ->withQueryString()
-                ->through(fn (Product $product): array => (new ProductCardResource($product))->resolve());
-        }
-
         return Inertia::render('Search', [
             'query' => $term,
-            'products' => $products !== null ? Inertia::scroll($products) : null,
+            'products' => $term !== ''
+                ? Inertia::scroll(ProductCardResource::paginate($search->query($term)->forStorefront()))
+                : null,
         ]);
     }
 }

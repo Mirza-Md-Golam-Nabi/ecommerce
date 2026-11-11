@@ -17,6 +17,16 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 class UniqueStoreSlug implements ValidationRule
 {
     /**
+     * Slug format (lowercase words joined by single dashes), used by the `/{slug}` route constraint.
+     */
+    public const PATTERN = '[a-z0-9]+(?:-[a-z0-9]+)*';
+
+    /**
+     * Same format as a full-match validation regex.
+     */
+    public const REGEX = '/^'.self::PATTERN.'$/';
+
+    /**
      * Slugs reserved for application routes. Keep in sync with routes/web.php.
      *
      * @var list<string>

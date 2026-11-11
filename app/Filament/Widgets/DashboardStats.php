@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\OrderStatus;
 use App\Filament\Pages\PurchaseList;
 use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Support\ProfitColor;
 use App\Services\Reports\DateRange;
 use App\Services\Reports\OrderReport;
 use App\Services\Reports\SalesReport;
@@ -28,7 +29,7 @@ class DashboardStats extends StatsOverviewWidget
         $month = $sales->totals(DateRange::thisMonth());
         $last14 = $sales->series(DateRange::lastDays(14));
         $pipeline = app(OrderReport::class)->openPipeline();
-        $margin = SalesReport::margin($month);
+        $marginLabel = SalesReport::marginLabel($month);
 
         return [
             Stat::make('আজকের বিক্রি', Money::format($today['revenue']))
@@ -36,9 +37,9 @@ class DashboardStats extends StatsOverviewWidget
                 ->chart(array_map(fn (array $row): int => (int) $row['revenue'], $last14))
                 ->color('primary'),
             Stat::make('আজকের লাভ', Money::format($today['gross_profit']))
-                ->color($today['gross_profit'] >= 0 ? 'success' : 'danger'),
+                ->color(ProfitColor::for($today['gross_profit'])),
             Stat::make('এই মাসের বিক্রি', Money::format($month['revenue']))
-                ->description('লাভ '.Money::format($month['gross_profit']).($margin !== null ? " · মার্জিন {$margin}%" : ''))
+                ->description('লাভ '.Money::format($month['gross_profit']).($marginLabel !== null ? " · {$marginLabel}" : ''))
                 ->chart(array_map(fn (array $row): int => (int) $row['gross_profit'], $last14))
                 ->color('success'),
             Stat::make('ফোনে নিশ্চিত করতে হবে', (string) ($pipeline[OrderStatus::Pending->value] ?? 0))

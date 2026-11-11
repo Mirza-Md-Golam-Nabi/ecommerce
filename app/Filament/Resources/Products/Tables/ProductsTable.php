@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Products\Tables;
 
 use App\Enums\SaleType;
+use App\Filament\Tables\CategoryPathColumn;
+use App\Filament\Tables\MoneyColumn;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTree;
 use App\Support\Money;
@@ -39,22 +41,17 @@ class ProductsTable
                     ->description(fn (Product $record): string => $record->unit_label)
                     ->searchable(['name', 'slug', 'search_keywords'])
                     ->sortable(),
-                TextColumn::make('category_id')
-                    ->label('ক্যাটাগরি')
-                    ->formatStateUsing(fn (int $state): string => app(CategoryTree::class)->pathLabel($state))
-                    ->toggleable(),
+                CategoryPathColumn::make()->toggleable(),
                 TextColumn::make('sale_type')
                     ->label('ধরন')
                     ->badge()
                     ->toggleable(),
-                TextColumn::make('price')
+                MoneyColumn::make('price')
                     ->label('দাম')
-                    ->formatStateUsing(fn (int $state): string => Money::format($state))
                     ->description(fn (Product $record): ?string => $record->compare_at_price ? 'আগে '.Money::format($record->compare_at_price) : null)
                     ->sortable(),
-                TextColumn::make('estimated_cost')
+                MoneyColumn::make('estimated_cost')
                     ->label('আনুমানিক ক্রয়মূল্য')
-                    ->formatStateUsing(fn (int $state): string => Money::format($state))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_available')

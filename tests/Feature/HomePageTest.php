@@ -3,10 +3,6 @@
 use App\Settings\StoreSettings;
 use Inertia\Testing\AssertableInertia as Assert;
 
-beforeEach(function () {
-    $this->withoutVite();
-});
-
 it('renders the home page with shared store info', function () {
     app(StoreSettings::class)->save(['store_name' => 'তাজা বাজার', 'store_phone' => '01712345678']);
 

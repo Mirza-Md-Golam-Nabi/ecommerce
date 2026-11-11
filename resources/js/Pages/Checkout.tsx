@@ -2,19 +2,21 @@ import { Head, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 
 import { ErrorBanner, Field, inputClasses, PrimaryButton } from '@/Components/Form';
+import OrderTotals from '@/Components/OrderTotals';
 import ProductImage from '@/Components/ProductImage';
+import { COD_NOTE } from '@/lib/copy';
 import { formatMoney, toBanglaDigits } from '@/lib/format';
 import type { Area, BagDetails } from '@/types';
-
-const OTHER_AREA = 'other';
 
 interface CheckoutProps {
     summary: BagDetails;
     areas: Area[];
+    /** Value of the "অন্যান্য" option (App\Http\Requests\Storefront\CheckoutRequest::OTHER_AREA). */
+    otherArea: string;
     address: { recipient_name: string; phone: string; area: string; area_other: string; address_line: string };
 }
 
-export default function Checkout({ summary, areas, address }: CheckoutProps) {
+export default function Checkout({ summary, areas, otherArea, address }: CheckoutProps) {
     const form = useForm({ ...address, customer_note: '' });
     const errors = form.errors as Record<string, string | undefined>;
     const orderableLines = summary.items.filter((line) => line.can_be_ordered);
@@ -67,11 +69,11 @@ export default function Checkout({ summary, areas, address }: CheckoutProps) {
                                     {area.name}
                                 </option>
                             ))}
-                            <option value={OTHER_AREA}>অন্যান্য</option>
+                            <option value={otherArea}>অন্যান্য</option>
                         </select>
                     </Field>
 
-                    {form.data.area === OTHER_AREA && (
+                    {form.data.area === otherArea && (
                         <Field label="আপনার এলাকার নাম" htmlFor="area_other" error={form.errors.area_other}>
                             <input
                                 id="area_other"
@@ -127,23 +129,16 @@ export default function Checkout({ summary, areas, address }: CheckoutProps) {
 
                     {hasUnavailable && <p className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">কিছু পণ্য এখন পাওয়া যাচ্ছে না — ব্যাগ থেকে সরিয়ে নিন।</p>}
 
-                    <div className="space-y-2 border-t border-line pt-4">
-                        <div className="flex justify-between text-muted">
-                            <span>পণ্যের দাম</span>
-                            <span className="text-ink">{formatMoney(summary.subtotal)}</span>
-                        </div>
-                        <div className="flex justify-between text-muted">
-                            <span>ডেলিভারি চার্জ</span>
-                            <span className="text-ink">{formatMoney(summary.delivery_charge)}</span>
-                        </div>
-                        <div className="flex justify-between border-t border-dashed border-line pt-2 text-xl font-bold">
-                            <span>মোট {summary.has_weighted && <span className="text-sm font-medium text-muted">(আনুমানিক)</span>}</span>
-                            <span className="text-primary">{formatMoney(summary.total)}</span>
-                        </div>
-                        {summary.has_weighted && <p className="text-xs text-muted">ওজনের পণ্যের চূড়ান্ত দাম ডেলিভারির সময় আসল ওজন অনুযায়ী ঠিক হবে।</p>}
+                    <div className="border-t border-line pt-4">
+                        <OrderTotals
+                            subtotal={summary.subtotal}
+                            deliveryCharge={summary.delivery_charge}
+                            total={summary.total}
+                            isEstimated={summary.has_weighted}
+                        />
                     </div>
 
-                    <div className="rounded-xl bg-accent/15 px-4 py-3 text-sm text-ink">💵 ক্যাশ অন ডেলিভারি — পণ্য হাতে পেয়ে টাকা দিন। অর্ডারের পর আমরা ফোন করে নিশ্চিত করব।</div>
+                    <div className="rounded-xl bg-accent/15 px-4 py-3 text-sm text-ink">{COD_NOTE}। অর্ডারের পর আমরা ফোন করে নিশ্চিত করব।</div>
 
                     <PrimaryButton disabled={form.processing || hasUnavailable}>অর্ডার নিশ্চিত করুন</PrimaryButton>
                 </aside>

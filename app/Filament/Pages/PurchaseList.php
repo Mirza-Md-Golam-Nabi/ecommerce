@@ -6,14 +6,16 @@ use App\Actions\Order\ApplyPurchaseCosts;
 use App\Actions\Order\ChangeOrderStatus;
 use App\Actions\Order\MarkItemUnavailable;
 use App\Enums\OrderStatus;
+use App\Filament\Concerns\RunsOrderActions;
 use App\Filament\Forms\MoneyInput;
 use App\Filament\Support\DomainAction;
+use App\Filament\Tables\CategoryPathColumn;
+use App\Filament\Tables\MoneyColumn;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\User;
-use App\Services\Catalog\CategoryTree;
 use App\Support\Money;
+use App\Support\Weight;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -27,7 +29,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 /**
@@ -37,6 +38,7 @@ use UnitEnum;
 class PurchaseList extends Page implements HasTable
 {
     use InteractsWithTable;
+    use RunsOrderActions;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
@@ -82,21 +84,18 @@ class PurchaseList extends Page implements HasTable
                     ->description(fn (Product $record): string => $record->unit_label)
                     ->weight('bold')
                     ->searchable(),
-                TextColumn::make('category_id')
-                    ->label('ক্যাটাগরি')
-                    ->formatStateUsing(fn (int $state): string => app(CategoryTree::class)->pathLabel($state))
-                    ->toggleable(),
+                CategoryPathColumn::make()->toggleable(),
                 TextColumn::make('to_buy_quantity')
                     ->label('কিনতে হবে')
                     ->formatStateUsing(fn (Product $record, int|string $state): string => $record->isWeighted()
-                        ? "{$state} × {$record->unit_label} (≈ ".rtrim(rtrim(number_format(((int) $state * (int) $record->nominal_weight_grams) / 1000, 3), '0'), '.').' কেজি)'
+                        ? "{$state} × {$record->unit_label} (≈ ".Weight::format((int) $state * (int) $record->nominal_weight_grams).')'
                         : "{$state}টি")
                     ->weight('bold')
                     ->size('lg'),
                 TextColumn::make('to_buy_orders')->label('অর্ডার'),
-                TextColumn::make('estimated_cost')
+                MoneyColumn::make('estimated_spend')
                     ->label('আনুমানিক খরচ')
-                    ->formatStateUsing(fn (Product $record): string => Money::format($record->estimated_cost * (int) $record->to_buy_quantity)),
+                    ->state(fn (Product $record): int => $record->estimated_cost * (int) $record->to_buy_quantity),
             ])
             ->headerActions([
                 Action::make('startPurchasing')
@@ -143,11 +142,5 @@ class PurchaseList extends Page implements HasTable
                             ->each(fn (OrderItem $item): OrderItem => app(MarkItemUnavailable::class)->handle($item, $data['note'] ?? null, $this->admin()));
                     }, 'পণ্যটি সব অর্ডারে "পাওয়া যায়নি" হয়েছে')),
             ]);
-    }
-
-    private function admin(): User
-    {
-        /** @var User */
-        return Auth::user();
     }
 }

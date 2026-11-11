@@ -14,7 +14,6 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
-    $this->withoutVite();
     $this->customer = Customer::factory()->create();
     $this->actingAs($this->customer, 'customer');
 });

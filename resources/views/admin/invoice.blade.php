@@ -1,9 +1,11 @@
 @php
     use App\Enums\OrderItemStatus;
     use App\Support\Money;
+    use App\Support\Theme;
+    use App\Support\Weight;
 
     /** @var \App\Models\Order $order */
-    $kg = fn (int $grams): string => rtrim(rtrim(number_format($grams / 1000, 3), '0'), '.').' কেজি';
+    $primary = Theme::current()->colors['primary'];
 @endphp
 <!DOCTYPE html>
 <html lang="bn">
@@ -30,7 +32,7 @@
         .grand { font-size: 18px; font-weight: 700; border-top: 2px solid #1c1c1c; margin-top: 4px; padding-top: 8px !important; }
         .note { margin-top: 16px; padding: 10px 12px; background: #f7f3e8; border-radius: 8px; }
         .actions { text-align: center; margin-bottom: 16px; }
-        .actions button { font: inherit; padding: 8px 20px; border-radius: 8px; border: 0; background: #0F3D2E; color: #fff; cursor: pointer; }
+        .actions button { font: inherit; padding: 8px 20px; border-radius: 8px; border: 0; background: {{ $primary }}; color: #fff; cursor: pointer; }
         @media print { .actions { display: none; } body { padding: 0; } }
     </style>
 </head>
@@ -76,7 +78,7 @@
                     @if ($unavailable)
                         পাওয়া যায়নি
                     @elseif ($item->isWeighted())
-                        {{ $item->actual_weight_grams !== null ? $kg($item->actual_weight_grams) : '≈ '.$kg($item->quantity * (int) $item->nominal_weight_grams) }}
+                        {{ $item->actual_weight_grams !== null ? Weight::format($item->actual_weight_grams) : '≈ '.Weight::format($item->orderedGrams()) }}
                     @else
                         {{ $item->fulfilled_quantity ?? $item->quantity }}টি
                     @endif

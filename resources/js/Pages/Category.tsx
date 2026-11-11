@@ -1,31 +1,28 @@
 import { Head, Link } from '@inertiajs/react';
 
 import Breadcrumbs from '@/Components/Breadcrumbs';
-import CategoryTile from '@/Components/CategoryTile';
+import CategoryTile, { categoryGridClasses } from '@/Components/CategoryTile';
+import EmptyState from '@/Components/EmptyState';
 import ProductGrid from '@/Components/ProductGrid';
 import type { Breadcrumb, CategoryTileData, ProductCard, ScrollData } from '@/types';
-
-type Sort = 'name' | 'price_asc' | 'price_desc' | 'popular';
 
 interface CategoryPageProps {
     category: { id: number; name: string; slug: string; icon: string | null };
     breadcrumbs: Breadcrumb[];
     subcategories: CategoryTileData[];
     products: ScrollData<ProductCard> | null;
-    sort: Sort | null;
+    sort: string | null;
+    /** value => label from App\Models\Product::SORT_OPTIONS (first = default). */
+    sortOptions: Record<string, string> | [];
 }
-
-const sortOptions: { value: Sort; label: string }[] = [
-    { value: 'name', label: 'নাম অনুযায়ী' },
-    { value: 'price_asc', label: 'দাম: কম → বেশি' },
-    { value: 'price_desc', label: 'দাম: বেশি → কম' },
-    { value: 'popular', label: 'জনপ্রিয়' },
-];
 
 /**
  * A category with sub-categories shows tiles; a leaf category shows its products (Chaldal model).
  */
-export default function Category({ category, breadcrumbs, subcategories, products, sort }: CategoryPageProps) {
+export default function Category({ category, breadcrumbs, subcategories, products, sort, sortOptions }: CategoryPageProps) {
+    const options = Object.entries(sortOptions);
+    const defaultSort = options[0]?.[0];
+
     return (
         <>
             <Head title={category.name} />
@@ -39,20 +36,20 @@ export default function Category({ category, breadcrumbs, subcategories, product
 
                 {products && (
                     <div className="flex flex-wrap gap-2" role="group" aria-label="সাজান">
-                        {sortOptions.map((option) => (
+                        {options.map(([value, label]) => (
                             <Link
-                                key={option.value}
+                                key={value}
                                 href={`/${category.slug}`}
-                                data={option.value === 'name' ? {} : { sort: option.value }}
+                                data={value === defaultSort ? {} : { sort: value }}
                                 preserveScroll={false}
                                 replace
                                 className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
-                                    sort === option.value
+                                    sort === value
                                         ? 'border-primary bg-primary text-primary-fg shadow'
                                         : 'border-line bg-card text-ink hover:border-primary hover:text-primary'
                                 }`}
                             >
-                                {option.label}
+                                {label}
                             </Link>
                         ))}
                     </div>
@@ -60,7 +57,7 @@ export default function Category({ category, breadcrumbs, subcategories, product
             </div>
 
             {subcategories.length > 0 && (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+                <div className={categoryGridClasses}>
                     {subcategories.map((subcategory) => (
                         <CategoryTile key={subcategory.id} category={subcategory} />
                     ))}
@@ -71,10 +68,7 @@ export default function Category({ category, breadcrumbs, subcategories, product
                 (products.data.length > 0 ? (
                     <ProductGrid data="products" products={products.data} />
                 ) : (
-                    <div className="rounded-2xl border border-dashed border-line bg-card py-16 text-center">
-                        <span className="text-5xl">📦</span>
-                        <p className="mt-3 text-muted">এই ক্যাটাগরিতে এখনো কোনো পণ্য নেই।</p>
-                    </div>
+                    <EmptyState icon="📦" title="এই ক্যাটাগরিতে এখনো কোনো পণ্য নেই" />
                 ))}
         </>
     );

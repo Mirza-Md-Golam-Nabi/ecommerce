@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\Customers;
 
-use App\Enums\CustomerRisk;
 use App\Filament\Resources\Customers\Pages\ManageCustomers;
+use App\Filament\Tables\CustomerRiskColumn;
 use App\Models\Customer;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -55,10 +55,7 @@ class CustomerResource extends Resource
                     ->label('নাম')
                     ->description(fn (Customer $record): string => $record->phone)
                     ->searchable(['name', 'phone']),
-                TextColumn::make('risk')
-                    ->label('অবস্থা')
-                    ->state(fn (Customer $record): CustomerRisk => CustomerRisk::for($record))
-                    ->badge(),
+                CustomerRiskColumn::make()->label('অবস্থা'),
                 TextColumn::make('orders_count')->label('মোট অর্ডার')->sortable(),
                 TextColumn::make('delivered_count')->label('ডেলিভারি')->sortable()->color('success'),
                 TextColumn::make('cancelled_count')->label('বাতিল')->sortable()->color('danger'),

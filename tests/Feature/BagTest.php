@@ -9,7 +9,6 @@ use App\Settings\StoreSettings;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
-    $this->withoutVite();
     $this->withCredentials();
     $this->product = Product::factory()->for(Category::factory())->create(['price' => 8500]);
 });

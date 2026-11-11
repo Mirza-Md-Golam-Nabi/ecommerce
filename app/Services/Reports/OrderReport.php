@@ -67,7 +67,7 @@ final class OrderReport
     public function openPipeline(): array
     {
         return Order::query()
-            ->whereIn('status', array_filter(OrderStatus::cases(), fn (OrderStatus $status): bool => ! $status->isFinal()))
+            ->whereIn('status', OrderStatus::active())
             ->selectRaw('status, count(*) as orders')
             ->groupBy('status')
             ->toBase()
