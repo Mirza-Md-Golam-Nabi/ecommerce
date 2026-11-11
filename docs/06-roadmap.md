@@ -12,11 +12,13 @@ Mark `[x]` when done. Each item = one branch/PR with Pest tests.
 - [x] `preventLazyLoading`, admin user seeder (`ADMIN_EMAIL`/`ADMIN_PASSWORD` env)
 
 ## Phase 1 — Catalog (admin)
-- [ ] categories (tree, path, is_leaf) + Filament CategoryResource (tree-aware, leaf rule)
-- [ ] products + product_images + Filament ProductResource (fixed/weighted fields, availability toggle)
-- [ ] `UniqueStoreSlug` rule + reserved words
-- [ ] areas + Filament AreaResource
-- [ ] Factories/seeders: realistic Bangla grocery tree (খাবার → রান্না → মসলা …)
+- [x] categories (tree, path, is_leaf) + Filament CategoryResource (tree-aware, leaf rule)
+- [x] `CategoryTree` cached service (lineage, path labels, leaf/parent options)
+- [x] products + product_images + Filament ProductResource (fixed/weighted fields, availability toggle, bulk available/unavailable)
+- [x] `UniqueStoreSlug` rule + reserved words
+- [x] areas + Filament AreaResource
+- [x] Factories/seeders: realistic Bangla grocery tree (খাবার → রান্না → মসলা …), demo data skipped in production
+- Note: images are resized in the browser on upload (max 1000px). Server-side WebP thumbnails are deferred (needs an image library — ask before adding).
 
 ## Phase 2 — Storefront
 - [ ] StoreLayout: header, search, category sidebar, bag button

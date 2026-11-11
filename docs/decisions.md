@@ -53,3 +53,9 @@ Business buys from local shops per order. Own stock may be added later (`track_s
 **D-020 — 2026-11-11 — Admin-selectable color themes (presets in `config/themes.php`, CSS variables, default Emerald & Gold).**
 
 **D-021 — 2026-11-11 — Scope v1 excludes coupons, time slots, favourites, flash sales, multi-language, multi-city.**
+
+**D-022 — 2026-11-11 — No manual ordering: areas, categories and products are listed by `name` A→Z (`sort_order` removed).**
+Less admin work. Only exceptions: `categories.home_sort_order` (home page "popular categories") and `product_images.sort_order` (drag-to-reorder gallery).
+
+**D-023 — 2026-11-11 — Edit & Delete buttons are icon-only (with tooltip) across the whole project.**
+Cleaner, compact tables and lists. Enforced globally for Filament in `AppServiceProvider`.

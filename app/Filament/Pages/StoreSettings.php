@@ -17,6 +17,7 @@ use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use UnitEnum;
 
 /**
  * Admin-editable store settings: store info, storefront theme, order defaults.
@@ -30,6 +31,8 @@ class StoreSettings extends Page
     protected static ?string $navigationLabel = 'স্টোর সেটিংস';
 
     protected static ?string $title = 'স্টোর সেটিংস';
+
+    protected static string|UnitEnum|null $navigationGroup = 'সেটিংস';
 
     protected static ?int $navigationSort = 100;
 

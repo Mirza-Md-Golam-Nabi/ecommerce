@@ -18,3 +18,13 @@
 13. Never edit a migration that ran in production.
 14. Run `vendor/bin/pint --dirty` before finishing.
 15. Changing a design rule → update the relevant `docs/*.md` and `docs/decisions.md`.
+
+## UI rules
+
+16. **Edit & Delete are icon-only everywhere** (admin panel and storefront): pencil icon for edit,
+    trash icon for delete — no text label on the button. Always add a tooltip + accessible label
+    (`এডিট` / `মুছুন`) so the meaning is clear on hover and for screen readers.
+    - Filament: configured globally in `App\Providers\AppServiceProvider::configureFilamentActions()`
+      (`EditAction` / `DeleteAction` → `iconButton()` + tooltip). Do not override this per resource.
+    - React storefront: use one shared icon-button component for edit/delete (e.g. address list, bag item remove).
+    - Other actions (Create, Save, Restore, bulk actions) keep their text labels.

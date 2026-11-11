@@ -6,7 +6,7 @@
 2. Add to bag from product card (qty stepper on the card) or product modal.
    Guest bag keyed by cookie token; merged on login (`MergeGuestBag`).
 3. Checkout requires login/register (name, phone, password).
-4. Address: **area dropdown** (active areas by sort_order, then **"অন্যান্য"** last).
+4. Address: **area dropdown** (active areas by name A→Z, then **"অন্যান্য"** last).
    - Area chosen → `area_id`.
    - "অন্যান্য" → `area_id = null`, required text `area_other`.
    - Then `address_line` text (house, road, landmark).
