@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Enums\OrderItemStatus;
+use App\Enums\OrderStatus;
 use App\Enums\SaleType;
 use App\Support\BanglaNumber;
 use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -88,6 +91,19 @@ class OrderItem extends Model
     public function isWeighted(): bool
     {
         return $this->sale_type === SaleType::Weighted;
+    }
+
+    /**
+     * Purchase list: items of confirmed/purchasing orders not yet bought (no actual cost, still pending).
+     *
+     * @param  Builder<OrderItem>  $query
+     */
+    #[Scope]
+    protected function toBuy(Builder $query): void
+    {
+        $query->where('status', OrderItemStatus::Pending)
+            ->whereNull('actual_unit_cost')
+            ->whereHas('order', fn (Builder $order): Builder => $order->whereIn('status', [OrderStatus::Confirmed, OrderStatus::Purchasing]));
     }
 
     /**

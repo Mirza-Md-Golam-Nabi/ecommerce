@@ -62,17 +62,29 @@ pending ─► confirmed ─► purchasing ─► out_for_delivery ─► delive
 
 ## Purchase List (admin daily workflow)
 
-Filament page **"কেনাকাটার তালিকা"**: all `pending` items of orders in `confirmed`/`purchasing`,
-grouped by product:
+Filament page **"কেনাকাটার তালিকা"** (`App\Filament\Pages\PurchaseList`): items still to buy
+(`OrderItem::toBuy()` = status `pending`, no actual cost, order `confirmed`/`purchasing`), summed per product:
 
-| Product | Unit | Total qty | Total grams (weighted) | Orders | Actual unit cost [input] |
+| Product | Category | To buy (qty, ≈ kg for weighted) | Orders | Estimated cost | [কেনা হয়েছে] [পাওয়া যায়নি] |
 |---|---|---|---|---|---|
 
-- Printable.
-- "Start purchasing" bulk action moves the selected orders to `purchasing`.
-- Admin enters **actual unit cost** per product row → `ApplyPurchaseCosts` sets
-  `actual_unit_cost` on every matching line → line_cost/cost_total recomputed.
-- Per row, admin can mark a product **unavailable** for all included orders in one click.
+- Printable (browser print). Subheading shows the estimated total spend.
+- "নিশ্চিত অর্ডারগুলো কেনাকাটায় নিন" moves all `confirmed` orders to `purchasing`.
+- **কেনা হয়েছে** → admin enters the actual unit cost → `ApplyPurchaseCosts` sets `actual_unit_cost`
+  on every matching line; fixed-price lines become `fulfilled` (full quantity). Weighted lines stay
+  `pending` until the actual weight is entered on the order page. The product leaves the list.
+- **পাওয়া যায়নি** → `MarkItemUnavailable` on every matching line.
+
+## Admin order page (Filament)
+
+- Tabs: চলমান (default) / each status / সব, with counts. Navigation badge = pending orders.
+- Header buttons follow the lifecycle (only the valid next step is shown) + বাতিল (reason required).
+  "আরও" menu: delivery charge, admin note, invoice print (`/admin/orders/{order_number}/invoice`).
+- Items table actions (until delivered/cancelled): আসল ওজন দিন (kg), কতটি কেনা হয়েছে,
+  ক্রয়মূল্য দিন, পাওয়া যায়নি. Marking every item unavailable auto-cancels the order (`all_unavailable`).
+- History tab lists `order_events` with who/when/what.
+- Risk badge (`CustomerRisk`): ঝুঁকিপূর্ণ = blocked, or ≥2 cancellations and cancellations ≥ deliveries;
+  বিশ্বস্ত = at least one delivery; otherwise নতুন কাস্টমার.
 
 ## Unavailable items
 

@@ -101,6 +101,14 @@ class Product extends Model
     }
 
     /**
+     * @return HasMany<OrderItem, $this>
+     */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
      * @param  Builder<Product>  $query
      */
     #[Scope]

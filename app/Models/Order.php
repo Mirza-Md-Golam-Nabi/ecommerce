@@ -121,6 +121,14 @@ class Order extends Model
     }
 
     /**
+     * Items, delivery charge and costs may change only until the order is delivered or cancelled.
+     */
+    public function isEditable(): bool
+    {
+        return ! $this->status->isFinal();
+    }
+
+    /**
      * True while the bill may still change: undelivered order with a weighted item not yet weighed.
      * Requires the `items` relation to be loaded.
      */

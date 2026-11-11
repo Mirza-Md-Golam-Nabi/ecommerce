@@ -74,3 +74,11 @@ Checkout prefills it and saves any edits back to it. Orders keep their own addre
 
 **D-028 — 2026-11-11 — Order number = `ORD-YYMMDD-` + zero-padded order id (e.g. `ORD-261111-0042`), assigned right after insert.**
 Unique without a separate sequence or locking. Customer URLs use it: `/orders/{order_number}`.
+
+**D-029 — 2026-11-11 — Purchase list: entering a product's bought unit cost marks its fixed-price lines as bought in full; weighted lines wait for the actual weight.**
+One step per product in the market; partial purchases are corrected per order on the order page.
+
+**D-030 — 2026-11-11 — Order lines stay editable (weight, quantity, cost, unavailable, delivery charge) until the order is delivered or cancelled; marking every line unavailable cancels the order automatically.**
+
+**D-031 — 2026-11-11 — Admin order actions reload the order page after success.**
+Keeps the summary, items table, history and buttons consistent (they are separate Livewire components).

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\OrderInvoiceController;
 use App\Http\Controllers\Storefront\Auth\LoginController;
 use App\Http\Controllers\Storefront\Auth\RegisterController;
 use App\Http\Controllers\Storefront\BagController;
@@ -43,6 +44,9 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
+
+/* Admin-only printable invoice (auth checked in the controller against the Filament `web` guard). */
+Route::get('/admin/orders/{order}/invoice', OrderInvoiceController::class)->name('admin.orders.invoice');
 
 /* Must stay last: flat category/product URLs like /spices or /radhuni-holud-gura-200g. */
 Route::get('/{slug}', [CatalogController::class, 'show'])

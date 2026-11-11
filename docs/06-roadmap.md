@@ -37,9 +37,11 @@ Mark `[x]` when done. Each item = one branch/PR with Pest tests.
 - [x] My orders + order detail (timeline, unavailable messages, customer cancel while pending)
 
 ## Phase 3B — Order management (admin)
-- [ ] Filament OrderResource: status actions, delivery charge edit, item weight/qty/unavailable, events timeline, risk badge, invoice print
-- [ ] Filament CustomerResource (block/unblock, order history)
-- [ ] Purchase List page + `ApplyPurchaseCosts`
+- [x] Filament OrderResource: status tabs with counts, status actions, delivery charge edit, admin note, item weight/qty/cost/unavailable, events timeline, risk badge, invoice print
+- [x] Item actions: `MarkItemUnavailable` (auto-cancel when nothing left), `SetItemFulfillment`, `SetItemCost`, `SetDeliveryCharge`
+- [x] Filament CustomerResource (risk, counters, block switch)
+- [x] Purchase List page + `ApplyPurchaseCosts` + "start purchasing" for confirmed orders
+- Note: Filament tests use `callTableAction`/`assertTableActionHidden` (deprecated in v5 but working) — migrate to `TestAction` when convenient.
 
 ## Phase 4 — Reports
 - [ ] Summary tables, listener, `reports:rebuild`
