@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
+import { usePage } from '@inertiajs/react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 type ToastTone = 'success' | 'error';
 
@@ -22,6 +23,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const value = useMemo(() => show, [show]);
+
+    /* Server flash messages (session 'success' / 'error') appear as toasts after a visit. */
+    const { flash } = usePage().props;
+
+    useEffect(() => {
+        if (flash.success) {
+            show(flash.success, 'success');
+        }
+
+        if (flash.error) {
+            show(flash.error, 'error');
+        }
+    }, [flash, show]);
 
     return (
         <ToastContext.Provider value={value}>

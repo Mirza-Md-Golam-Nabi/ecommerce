@@ -5,14 +5,16 @@ namespace App\Services\Cart;
 use App\Http\Resources\ProductCardResource;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Customer;
 use App\Settings\StoreSettings;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 
 /**
- * Resolves the current visitor's bag from the `bag_token` cookie (guests).
- * Phase 3 adds customer bags and merging on login.
+ * Resolves the current visitor's bag: the logged-in customer's bag, otherwise the guest bag
+ * from the `bag_token` cookie. Guest bags are merged into the customer bag on login (MergeGuestBag).
  *
  * @phpstan-type BagSummary array{count: int, subtotal: int, items: array<int, int>}
  */
@@ -26,25 +28,43 @@ final class CurrentBag
 
     public function find(): ?Cart
     {
-        $token = request()->cookie(self::COOKIE);
+        $customer = Auth::guard('customer')->user();
 
-        if (! is_string($token) || ! Str::isUuid($token)) {
-            return null;
+        if ($customer instanceof Customer) {
+            return Cart::query()->where('customer_id', $customer->id)->first();
         }
 
-        return Cart::query()->where('token', $token)->first();
+        return self::findGuestBag(request()->cookie(self::COOKIE));
     }
 
     /**
-     * Find the bag or start a new one, and (re)queue the cookie so it stays alive for 30 days.
+     * Find the bag or start a new one. Guests get the cookie (re)queued so it stays alive for 30 days.
      */
     public function findOrCreate(): Cart
     {
+        $customer = Auth::guard('customer')->user();
+
+        if ($customer instanceof Customer) {
+            return Cart::query()->firstOrCreate(['customer_id' => $customer->id], ['token' => (string) Str::uuid()]);
+        }
+
         $cart = $this->find() ?? Cart::query()->create(['token' => (string) Str::uuid()]);
 
         Cookie::queue(self::COOKIE, $cart->token, self::COOKIE_MINUTES);
 
         return $cart;
+    }
+
+    /**
+     * A guest bag by its cookie token (never a bag that already belongs to a customer).
+     */
+    public static function findGuestBag(mixed $token): ?Cart
+    {
+        if (! is_string($token) || ! Str::isUuid($token)) {
+            return null;
+        }
+
+        return Cart::query()->whereNull('customer_id')->where('token', $token)->first();
     }
 
     /**

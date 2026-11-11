@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 
+import AccountMenu from '@/Components/AccountMenu';
 import { BagIcon, MenuIcon, PhoneIcon } from '@/Components/Icons';
 import SearchBox from '@/Components/SearchBox';
 import { useBag } from '@/contexts/BagContext';
@@ -26,19 +27,22 @@ export default function Header({ onOpenMenu }: { onOpenMenu: () => void }) {
                     {store.name}
                 </Link>
 
-                <button
-                    type="button"
-                    onClick={bag.open}
-                    aria-label="ব্যাগ দেখুন"
-                    className="relative ml-auto grid size-10 place-items-center rounded-xl hover:bg-white/10 lg:order-last lg:ml-0"
-                >
-                    <BagIcon className="size-6" />
-                    {bag.count > 0 && (
-                        <span className="absolute -top-1 -right-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-xs font-bold text-accent-fg">
-                            {toBanglaDigits(bag.count)}
-                        </span>
-                    )}
-                </button>
+                <div className="ml-auto flex items-center gap-1 lg:order-last lg:ml-0">
+                    <AccountMenu />
+                    <button
+                        type="button"
+                        onClick={bag.open}
+                        aria-label="ব্যাগ দেখুন"
+                        className="relative grid size-10 place-items-center rounded-xl hover:bg-white/10"
+                    >
+                        <BagIcon className="size-6" />
+                        {bag.count > 0 && (
+                            <span className="absolute -top-1 -right-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-xs font-bold text-accent-fg">
+                                {toBanglaDigits(bag.count)}
+                            </span>
+                        )}
+                    </button>
+                </div>
 
                 <SearchBox className="order-last w-full lg:order-none lg:mx-auto lg:max-w-2xl lg:flex-1" />
 

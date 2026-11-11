@@ -1,4 +1,4 @@
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import AddToBagControl from '@/Components/AddToBagControl';
@@ -150,14 +150,18 @@ export default function BagPanel() {
                             <span className="text-primary">{formatMoney(bag.subtotal + deliveryCharge)}</span>
                         </div>
                         {hasWeighted && <p className="text-xs text-muted">ওজনের পণ্যের চূড়ান্ত দাম ডেলিভারির সময় আসল ওজন অনুযায়ী ঠিক হবে।</p>}
-                        <button
-                            type="button"
-                            disabled
-                            className="mt-2 h-12 w-full rounded-xl bg-accent font-bold text-accent-fg shadow disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            অর্ডার করুন
-                        </button>
-                        <p className="text-center text-xs text-muted">চেকআউট শীঘ্রই চালু হবে · ক্যাশ অন ডেলিভারি</p>
+                        {bag.subtotal > 0 ? (
+                            <Link
+                                href="/checkout"
+                                onClick={bag.close}
+                                className="mt-2 flex h-12 w-full items-center justify-center rounded-xl bg-accent font-bold text-accent-fg shadow transition hover:brightness-105"
+                            >
+                                অর্ডার করুন
+                            </Link>
+                        ) : (
+                            <p className="mt-2 rounded-xl bg-danger/10 px-3 py-2 text-center text-sm text-danger">অর্ডার করার মতো পণ্য ব্যাগে নেই।</p>
+                        )}
+                        <p className="text-center text-xs text-muted">💵 ক্যাশ অন ডেলিভারি — পণ্য হাতে পেয়ে টাকা দিন</p>
                     </div>
                 )}
             </aside>

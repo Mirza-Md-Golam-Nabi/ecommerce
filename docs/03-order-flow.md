@@ -4,8 +4,11 @@
 
 1. Browse category tree / search (guest allowed).
 2. Add to bag from product card (qty stepper on the card) or product modal.
-   Guest bag keyed by cookie token; merged on login (`MergeGuestBag`).
-3. Checkout requires login/register (name, phone, password).
+   Guest bag keyed by cookie token; merged on login/registration (`MergeGuestBag`:
+   same product in both bags → the larger quantity wins, never summed).
+3. Checkout requires login/register (name, phone, password). Phone accepted in any format
+   (`+88`, spaces, dashes, Bangla digits) and stored normalized `01XXXXXXXXX`.
+   After login the customer returns to the page they wanted (e.g. `/checkout`).
 4. Address: **area dropdown** (active areas by name A→Z, then **"অন্যান্য"** last).
    - Area chosen → `area_id`.
    - "অন্যান্য" → `area_id = null`, required text `area_other`.

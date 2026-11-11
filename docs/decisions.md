@@ -68,3 +68,9 @@ Absolute values make retries idempotent; only the latest value per product is se
 
 **D-026 — 2026-11-11 — Customer-facing numbers (prices, counts) are shown in Bangla digits.**
 Matches the Bangla-only product names and unit labels.
+
+**D-027 — 2026-11-11 — One default address per customer for now (no address book).**
+Checkout prefills it and saves any edits back to it. Orders keep their own address snapshot, so changing it never alters past orders.
+
+**D-028 — 2026-11-11 — Order number = `ORD-YYMMDD-` + zero-padded order id (e.g. `ORD-261111-0042`), assigned right after insert.**
+Unique without a separate sequence or locking. Customer URLs use it: `/orders/{order_number}`.

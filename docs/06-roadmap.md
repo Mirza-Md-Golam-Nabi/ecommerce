@@ -28,12 +28,17 @@ Mark `[x]` when done. Each item = one branch/PR with Pest tests.
 - [x] Search (FULLTEXT ngram on MySQL, LIKE fallback)
 - [x] Guest bag (cookie) + BagPanel (optimistic, debounced)
 
-## Phase 3 — Customers & orders
-- [ ] customers + `customer` guard, register/login (phone)
-- [ ] Addresses with area dropdown + "অন্যান্য"
-- [ ] Checkout + `PlaceOrder`; quantity limits
-- [ ] My orders + order detail with unavailable messages
+## Phase 3A — Customers & checkout (storefront)
+- [x] customers + `customer` guard, register/login (phone, any format, Bangla digits), rate limits
+- [x] Guest bag merged into customer bag on login/registration (`MergeGuestBag`, larger quantity wins)
+- [x] Default address with area dropdown + "অন্যান্য" (saved at checkout, prefilled next time)
+- [x] Checkout + `PlaceOrder` (blocked customer, pending-order cap, availability, quantity limits)
+- [x] `LinePriceCalculator` / `OrderTotalsCalculator`; `ChangeOrderStatus` (transitions, counters, weights before delivery)
+- [x] My orders + order detail (timeline, unavailable messages, customer cancel while pending)
+
+## Phase 3B — Order management (admin)
 - [ ] Filament OrderResource: status actions, delivery charge edit, item weight/qty/unavailable, events timeline, risk badge, invoice print
+- [ ] Filament CustomerResource (block/unblock, order history)
 - [ ] Purchase List page + `ApplyPurchaseCosts`
 
 ## Phase 4 — Reports

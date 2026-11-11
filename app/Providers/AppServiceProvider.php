@@ -6,7 +6,10 @@ use App\Services\Catalog\CategoryTree;
 use App\Settings\StoreSettings;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +31,19 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
 
         $this->configureFilamentActions();
+        $this->configureRateLimiting();
+    }
+
+    /**
+     * Fake-order protection without OTP (docs/03-order-flow.md): limit registrations per IP
+     * and orders per customer.
+     */
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('register', fn (Request $request): Limit => Limit::perHour(5)->by($request->ip()));
+
+        RateLimiter::for('place-order', fn (Request $request): Limit => Limit::perHour(5)
+            ->by('customer:'.($request->user('customer')?->getAuthIdentifier() ?? $request->ip())));
     }
 
     /**

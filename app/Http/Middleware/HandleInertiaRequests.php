@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Customer;
 use App\Services\Cart\CurrentBag;
 use App\Services\Catalog\CategoryTree;
 use App\Settings\StoreSettings;
@@ -48,6 +49,15 @@ class HandleInertiaRequests extends Middleware
             ],
             'navigation' => Inertia::once(fn (): array => app(CategoryTree::class)->navigation()),
             'bag' => fn (): array => app(CurrentBag::class)->summary(),
+            'auth' => fn (): array => [
+                'customer' => ($customer = $request->user('customer')) instanceof Customer
+                    ? ['id' => $customer->id, 'name' => $customer->name, 'phone' => $customer->phone]
+                    : null,
+            ],
+            'flash' => fn (): array => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
         ];
     }
 }
