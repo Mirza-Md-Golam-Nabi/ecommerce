@@ -1,9 +1,26 @@
 @import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@source '../views';
+@source '../js';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/*
+ * Theme tokens. The actual colors come from CSS variables printed in
+ * resources/views/app.blade.php from the admin-selected preset in
+ * config/themes.php. Components must use these tokens (bg-primary,
+ * text-accent, border-line ...) and never hard-coded hex colors.
+ */
+@theme inline {
+    --font-sans: 'Hind Siliguri', ui-sans-serif, system-ui, sans-serif;
+
+    --color-primary: var(--c-primary);
+    --color-primary-fg: var(--c-primary-fg);
+    --color-accent: var(--c-accent);
+    --color-accent-fg: var(--c-accent-fg);
+    --color-surface: var(--c-surface);
+    --color-card: var(--c-card);
+    --color-success: var(--c-success);
+    --color-danger: var(--c-danger);
+    --color-ink: var(--c-ink);
+    --color-muted: var(--c-muted);
+    --color-line: var(--c-border);
 }

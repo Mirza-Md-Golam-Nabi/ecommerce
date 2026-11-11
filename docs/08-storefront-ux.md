@@ -1,0 +1,81 @@
+# 08 — Storefront UX (Chaldal-style) & Theme System
+
+Reference analysed: chaldal.com (Nov 2026). We copy the **interaction model**, not its
+branding, images or text.
+
+## Layout (desktop)
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ Logo   [🔍 পণ্য খুঁজুন ...................]        লগইন   🛍 ব্যাগ │  header (primary color)
+├───────────────┬──────────────────────────────────────────────────────┤
+│ Category tree │  Breadcrumb: খাবার › রান্না › মসলা                    │
+│ ▸ খাবার        │                                                      │
+│   ▾ রান্না      │  [ content: tiles OR product grid ]                 │
+│     • মসলা     │                                                      │  ┌──────┐
+│     • চাল      │                                                      │  │ 3 টি │ floating bag
+│ ▸ পরিষ্কার     │                                                      │  │ ৳450 │ button (accent)
+└───────────────┴──────────────────────────────────────────────────────┘  └──────┘
+```
+Mobile: sidebar becomes a slide-in drawer (hamburger); bag becomes a bottom bar.
+
+## Pages
+
+| Page | Content |
+|---|---|
+| **Home** | Hero banner (store promise: "বাজারের তাজা পণ্য, দরজায় পৌঁছে দিই · ক্যাশ অন ডেলিভারি"), then **জনপ্রিয় ক্যাটাগরি** grid (`show_on_home`). **No product lists on home.** |
+| **Category (non-leaf)** | Breadcrumb + grid of sub-category tiles (image + name). |
+| **Category (leaf)** | Breadcrumb + product grid (sort: default / দাম কম→বেশি / বেশি→কম / জনপ্রিয়), infinite scroll. |
+| **Product** | Modal when opened from grid (URL → `/{slug}`, back closes it); full page on direct visit. Gallery, name, unit_label, price (+ strike price), description, qty stepper / "ব্যাগে যোগ করুন". Weighted: note "চূড়ান্ত দাম ওজন অনুযায়ী নির্ধারিত হবে". |
+| **Search** | Same grid as leaf category. |
+| **Bag panel** | Slide-over from right: items with stepper, remove, subtotal, delivery charge, total (আনুমানিক if weighted), "অর্ডার করুন". |
+| **Checkout** | Login/register gate → name, phone, area dropdown (+ অন্যান্য last), address line, note → summary → place order. |
+| **Order placed** | Order number, thanks, what happens next (we'll call to confirm). |
+| **My orders / Order detail** | Status timeline, items; unavailable items shown with the polite message, struck-through price. |
+
+## ProductCard
+
+```
+┌────────────────────┐
+│      [image]       │  -12% badge if compare_at_price
+│ রাঁধুনি হলুদ গুঁড়া   │  name (2 lines max)
+│ ২০০ গ্রাম            │  unit_label (muted)
+│ ৳৮৫  ৳৯৫            │  price (bold) + strike
+│ [ ব্যাগে যোগ করুন ]   │  → after add becomes  [ − 2 + ]
+└────────────────────┘
+```
+States: unavailable → greyed, "এখন পাওয়া যাচ্ছে না", no button. At max limit → `+` disabled with tooltip.
+
+## Bag behaviour
+- Optimistic `useBag()` hook: map `productId → qty` from shared props; UI updates instantly,
+  request debounced (300 ms); on error revert + toast.
+- Bag count/total in header and floating button animate on change.
+
+## Visual style
+- Font: **Hind Siliguri** (Bangla + Latin), weights 400/500/600/700.
+- Rounded cards (`rounded-2xl`), soft shadows, generous whitespace, subtle hover lift.
+- Product images on white square with padding; consistent aspect ratio.
+- Micro-interactions: add-to-bag pulse, slide-over bag, skeleton loaders.
+
+## Theme system (admin-selectable)
+
+`config/themes.php` holds presets; `settings.theme` stores the chosen key
+(default `emerald_gold`). Filament **Store Settings** shows a select with color
+swatches preview.
+
+| key | Name | primary | accent | surface | card | success | text |
+|---|---|---|---|---|---|---|---|
+| `emerald_gold` (default) | Emerald & Gold | `#0F3D2E` | `#C9A227` | `#FAF7F0` | `#FFFFFF` | `#2E7D5B` | `#1C1C1C` |
+| `midnight_saffron` | Midnight & Saffron | `#14213D` | `#F59E0B` | `#FFF9F0` | `#FFFFFF` | `#16A34A` | `#111827` |
+| `plum_champagne` | Plum & Champagne | `#3B1E3F` | `#E6C79C` | `#FBF8F5` | `#FFFFFF` | `#3F8F5F` | `#1F1720` |
+
+Each preset also defines `primary_fg` and `accent_fg` (readable text color on that background;
+must pass WCAG AA contrast) plus `muted` and `border`.
+
+**Mechanism**
+1. `app.blade.php` prints `<style>:root{--c-primary:#0F3D2E; --c-accent:… }</style>` from
+   `Theme::current()` (cached) → correct colors on first paint.
+2. Tailwind maps tokens to those variables (`--color-primary: var(--c-primary)` in `@theme`),
+   so components use `bg-primary`, `text-accent`, `bg-surface`, etc.
+3. Changing theme in admin busts the settings cache; next page load uses new colors.
+   No rebuild needed. Adding a theme = adding one array entry in `config/themes.php`.
