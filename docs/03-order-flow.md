@@ -17,7 +17,7 @@
 ## Quantity limits
 
 Effective limit per product = `product.max_per_order` ?? `settings.default_max_qty_per_product` ?? unlimited.
-Enforced in `AddToBag`, `SetBagItemQuantity` and again in `PlaceOrder`. UI stepper disables `+` at the limit.
+Enforced in `SetBagItemQuantity` and again in `PlaceOrder`. UI stepper disables `+` at the limit.
 
 ## Line pricing formula (`LinePriceCalculator`)
 

@@ -59,3 +59,12 @@ Less admin work. Only exceptions: `categories.home_sort_order` (home page "popul
 
 **D-023 — 2026-11-11 — Edit & Delete buttons are icon-only (with tooltip) across the whole project.**
 Cleaner, compact tables and lists. Enforced globally for Filament in `AppServiceProvider`.
+
+**D-024 — 2026-11-11 — Quick-view modal does not change the URL.**
+Pushing history entries outside Inertia's router conflicts with its own history handling. The modal links to the full product page (`/{slug}`), which remains the shareable URL.
+
+**D-025 — 2026-11-11 — Bag updates send the absolute quantity per product (`PUT /bag/items/{id}`), debounced and optimistic; guest bags live in a 30-day cookie.**
+Absolute values make retries idempotent; only the latest value per product is sent.
+
+**D-026 — 2026-11-11 — Customer-facing numbers (prices, counts) are shown in Bangla digits.**
+Matches the Bangla-only product names and unit labels.

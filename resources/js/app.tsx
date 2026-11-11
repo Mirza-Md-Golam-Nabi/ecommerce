@@ -3,10 +3,17 @@ import '../css/app.css';
 import { createInertiaApp, type ResolvedComponent } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 
+import StoreLayout from '@/Layouts/StoreLayout';
+import type { SharedProps } from '@/types';
+
 const pages = import.meta.glob<{ default: ResolvedComponent }>('./Pages/**/*.tsx');
 
 createInertiaApp({
-    title: (title) => title,
+    title: (title, page) => {
+        const storeName = (page.props as unknown as SharedProps).store.name;
+
+        return title ? `${title} | ${storeName}` : storeName;
+    },
     resolve: async (name) => {
         const page = pages[`./Pages/${name}.tsx`];
 
@@ -16,6 +23,8 @@ createInertiaApp({
 
         return (await page()).default;
     },
+    /* Every storefront page uses the persistent StoreLayout unless it sets its own `layout`. */
+    layout: () => StoreLayout,
     setup({ el, App, props }) {
         if (el) {
             createRoot(el).render(<App {...props} />);

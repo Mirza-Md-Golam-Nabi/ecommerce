@@ -21,12 +21,12 @@ Mark `[x]` when done. Each item = one branch/PR with Pest tests.
 - Note: images are resized in the browser on upload (max 1000px). Server-side WebP thumbnails are deferred (needs an image library — ask before adding).
 
 ## Phase 2 — Storefront
-- [ ] StoreLayout: header, search, category sidebar, bag button
-- [ ] Home: hero + popular categories grid
-- [ ] `/{slug}` resolver: category (tiles or product grid) / product page
-- [ ] ProductCard with qty stepper; ProductModal
-- [ ] Search
-- [ ] Guest bag + BagPanel (optimistic)
+- [x] StoreLayout (persistent): header, search, collapsible category sidebar, mobile drawer, floating bag button / mobile bag bar
+- [x] Home: hero + popular categories grid
+- [x] `/{slug}` resolver: category (tiles or product grid with sort + infinite scroll) / product page
+- [x] ProductCard with qty stepper; quick-view modal
+- [x] Search (FULLTEXT ngram on MySQL, LIKE fallback)
+- [x] Guest bag (cookie) + BagPanel (optimistic, debounced)
 
 ## Phase 3 — Customers & orders
 - [ ] customers + `customer` guard, register/login (phone)

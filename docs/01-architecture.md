@@ -31,7 +31,7 @@ Staff roles (later): `role` enum on `users` + Policies.
 ```
 app/
   Actions/
-    Cart/        AddToBag, SetBagItemQuantity, MergeGuestBag
+    Cart/        SetBagItemQuantity (absolute qty, 0 removes), MergeGuestBag (Phase 3)
     Customer/    RegisterCustomer, SaveAddress
     Order/       PlaceOrder, ChangeOrderStatus, CancelOrder,
                  MarkItemUnavailable, SetItemFulfillment (weight/qty),
@@ -69,23 +69,29 @@ docs/
 ## 4. Routing (flat URLs like Chaldal)
 
 ```
-GET  /                      Home
-GET  /search?q=             Search results
-GET  /bag, POST/PATCH /bag/items      Bag (JSON-ish Inertia partial responses)
-GET  /checkout, POST /checkout
-GET  /orders, /orders/{order_number}
-GET  /login, /register ...
-GET  /{slug}                Catalog resolver — MUST be the last route
+GET  /                         Home (Inertia)
+GET  /search?q=                Search results (Inertia)
+GET  /bag                      Bag details (JSON, for the bag panel)
+PUT  /bag/items/{product}      Set absolute quantity, 0 removes (JSON, throttled 120/min)
+GET  /quick-view/{slug}        Product details (JSON, for the quick-view modal)
+GET  /checkout, POST /checkout            (Phase 3)
+GET  /orders, /orders/{order_number}      (Phase 3)
+GET  /login, /register ...                (Phase 3)
+GET  /{slug}                   Catalog resolver — MUST be the last route
 ```
 
-`/{slug}` resolution order: category slug (from cached map) → product slug →
-404. Categories and products share **one slug namespace**: a validation rule
-(`UniqueStoreSlug`) checks both tables plus a reserved-word list
-(`admin, bag, checkout, login, register, logout, orders, search, account, api, storage, build`).
+`/{slug}` resolution order: visible category (from `CategoryTree`) → active product in a
+visible category → 404. Categories and products share **one slug namespace**: a validation rule
+(`UniqueStoreSlug`) checks both tables plus `UniqueStoreSlug::RESERVED`. Any new top-level
+route segment must be added to that list.
 
-Product detail: when opened from a listing it shows as a **modal** over the list
-(client-side, URL updated to `/{product-slug}` via history), and a direct visit
-renders the full Product page. See `08-storefront-ux.md`.
+Product detail: clicking a product in a listing opens a **quick-view modal** (URL does not
+change; it links to the full page). A direct visit to `/{product-slug}` renders the full
+Product page. See `08-storefront-ux.md`.
+
+Shared Inertia props (`HandleInertiaRequests`): `store` (name, phone, default delivery charge),
+`navigation` (visible category tree, sent once per visit via `Inertia::once`), `bag` (summary:
+count, subtotal, quantities by product id). Page props must not reuse these names.
 
 ## 5. Settings
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SaleType;
+use App\Services\Catalog\CategoryTree;
 use App\Settings\StoreSettings;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -106,6 +107,22 @@ class Product extends Model
     protected function active(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    /**
+     * Shown in the storefront: active, not deleted, and its category (with all ancestors) is active.
+     */
+    public function isVisibleInStore(): bool
+    {
+        return $this->is_active && ! $this->trashed() && app(CategoryTree::class)->isVisible($this->category_id);
+    }
+
+    /**
+     * Visible and currently available in the market, so it can be added to the bag.
+     */
+    public function canBeOrdered(): bool
+    {
+        return $this->is_available && $this->isVisibleInStore();
     }
 
     public function isWeighted(): bool

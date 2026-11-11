@@ -19,8 +19,7 @@ final class PhoneNumber
             return null;
         }
 
-        $digits = strtr($input, ['০' => '0', '১' => '1', '২' => '2', '৩' => '3', '৪' => '4', '৫' => '5', '৬' => '6', '৭' => '7', '৮' => '8', '৯' => '9']);
-        $digits = preg_replace('/\D/', '', $digits) ?? '';
+        $digits = preg_replace('/\D/', '', BanglaNumber::toLatin($input)) ?? '';
 
         if (str_starts_with($digits, '880')) {
             $digits = substr($digits, 2);

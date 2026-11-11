@@ -26,7 +26,7 @@ Mobile: sidebar becomes a slide-in drawer (hamburger); bag becomes a bottom bar.
 | **Home** | Hero banner (store promise: "বাজারের তাজা পণ্য, দরজায় পৌঁছে দিই · ক্যাশ অন ডেলিভারি"), then **জনপ্রিয় ক্যাটাগরি** grid (`show_on_home`). **No product lists on home.** |
 | **Category (non-leaf)** | Breadcrumb + grid of sub-category tiles (image + name). |
 | **Category (leaf)** | Breadcrumb + product grid (sort: default / দাম কম→বেশি / বেশি→কম / জনপ্রিয়), infinite scroll. |
-| **Product** | Modal when opened from grid (URL → `/{slug}`, back closes it); full page on direct visit. Gallery, name, unit_label, price (+ strike price), description, qty stepper / "ব্যাগে যোগ করুন". Weighted: note "চূড়ান্ত দাম ওজন অনুযায়ী নির্ধারিত হবে". |
+| **Product** | Quick-view modal when clicked in a grid (URL unchanged; closes on Esc/backdrop/navigation; has a link to the full page); full page on direct visit to `/{slug}`. Gallery, name, unit_label, price (+ strike price), description, qty stepper / "ব্যাগে যোগ করুন". Weighted: note "চূড়ান্ত দাম ওজন অনুযায়ী নির্ধারিত হবে". |
 | **Search** | Same grid as leaf category. |
 | **Bag panel** | Slide-over from right: items with stepper, remove, subtotal, delivery charge, total (আনুমানিক if weighted), "অর্ডার করুন". |
 | **Checkout** | Login/register gate → name, phone, area dropdown (+ অন্যান্য last), address line, note → summary → place order. |
@@ -47,9 +47,18 @@ Mobile: sidebar becomes a slide-in drawer (hamburger); bag becomes a bottom bar.
 States: unavailable → greyed, "এখন পাওয়া যাচ্ছে না", no button. At max limit → `+` disabled with tooltip.
 
 ## Bag behaviour
-- Optimistic `useBag()` hook: map `productId → qty` from shared props; UI updates instantly,
-  request debounced (300 ms); on error revert + toast.
-- Bag count/total in header and floating button animate on change.
+- Guests can fill the bag (cookie `bag_token`, 30 days). Login is required only at checkout.
+- `BagContext` (`useBag()`): quantities by product id from the shared `bag` prop; the UI updates
+  instantly, and the **absolute** quantity per product is sent with `PUT /bag/items/{id}` after a
+  300 ms debounce. When nothing is pending, the server summary wins. On error: toast with the
+  server's Bangla message + reload of the `bag` prop.
+- Bag panel lists items from `GET /bag`; quantities/totals come from the context so it reacts instantly.
+  Items no longer orderable stay listed with a message and are excluded from the total.
+- Delete in the bag is an icon button (trash) with tooltip — conventions rule 16.
+
+## Numbers
+- Customer-facing numbers use Bangla digits: money via `formatMoney()` (`৳১,২৫০.৫`), counts via
+  `toBanglaDigits()` (`resources/js/lib/format.ts`). PHP side: `App\Support\BanglaNumber`.
 
 ## Visual style
 - Font: **Hind Siliguri** (Bangla + Latin), weights 400/500/600/700.

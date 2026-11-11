@@ -2,8 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Cart\CurrentBag;
+use App\Services\Catalog\CategoryTree;
 use App\Settings\StoreSettings;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -41,7 +44,10 @@ class HandleInertiaRequests extends Middleware
             'store' => fn (): array => [
                 'name' => app(StoreSettings::class)->storeName(),
                 'phone' => app(StoreSettings::class)->storePhone(),
+                'delivery_charge' => app(StoreSettings::class)->defaultDeliveryCharge(),
             ],
+            'navigation' => Inertia::once(fn (): array => app(CategoryTree::class)->navigation()),
+            'bag' => fn (): array => app(CurrentBag::class)->summary(),
         ];
     }
 }

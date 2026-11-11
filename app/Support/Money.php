@@ -7,8 +7,6 @@ namespace App\Support;
  */
 final class Money
 {
-    private const BANGLA_DIGITS = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-
     /**
      * Convert a taka amount (e.g. from an admin form) to poisha.
      */
@@ -41,7 +39,7 @@ final class Money
         }
 
         if ($bangla) {
-            $formatted = strtr($formatted, array_combine(range(0, 9), self::BANGLA_DIGITS));
+            $formatted = BanglaNumber::digits($formatted);
         }
 
         return ($negative ? '-' : '').'৳'.$formatted;

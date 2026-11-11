@@ -31,6 +31,9 @@ final class CategoryTree
     /** @var array<int, CategoryNode>|null */
     private ?array $nodes = null;
 
+    /** @var list<int>|null */
+    private ?array $visibleIds = null;
+
     /**
      * All non-deleted categories keyed by id, ordered by name (A→Z).
      *
@@ -61,6 +64,7 @@ final class CategoryTree
     {
         Cache::forget(self::CACHE_KEY);
         $this->nodes = null;
+        $this->visibleIds = null;
     }
 
     /**
@@ -111,6 +115,73 @@ final class CategoryTree
         }
 
         return $lineage !== [];
+    }
+
+    /**
+     * @return CategoryNode|null
+     */
+    public function findBySlug(string $slug): ?array
+    {
+        foreach ($this->nodes() as $node) {
+            if ($node['slug'] === $slug) {
+                return $node;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Ids of all categories customers can see (self and all ancestors active).
+     *
+     * @return list<int>
+     */
+    public function visibleIds(): array
+    {
+        return $this->visibleIds ??= array_values(array_filter(array_keys($this->nodes()), fn (int $id): bool => $this->isVisible($id)));
+    }
+
+    /**
+     * Visible categories flagged for the home page "popular categories" grid.
+     *
+     * @return list<CategoryNode>
+     */
+    public function homeCategories(): array
+    {
+        $categories = array_values(array_filter(
+            $this->nodes(),
+            fn (array $node): bool => $node['show_on_home'] && $this->isVisible($node['id']),
+        ));
+
+        usort($categories, fn (array $a, array $b): int => [$a['home_sort_order'], $a['name']] <=> [$b['home_sort_order'], $b['name']]);
+
+        return $categories;
+    }
+
+    /**
+     * Compact visible tree for the storefront sidebar (sent to the browser).
+     *
+     * @return list<array{id: int, parent_id: int|null, name: string, slug: string, icon: string|null, is_leaf: bool}>
+     */
+    public function navigation(): array
+    {
+        $visible = array_flip($this->visibleIds());
+        $navigation = [];
+
+        foreach ($this->nodes() as $id => $node) {
+            if (isset($visible[$id])) {
+                $navigation[] = [
+                    'id' => $node['id'],
+                    'parent_id' => $node['parent_id'],
+                    'name' => $node['name'],
+                    'slug' => $node['slug'],
+                    'icon' => $node['icon'],
+                    'is_leaf' => $node['is_leaf'],
+                ];
+            }
+        }
+
+        return $navigation;
     }
 
     /**

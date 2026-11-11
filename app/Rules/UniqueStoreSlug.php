@@ -23,7 +23,7 @@ class UniqueStoreSlug implements ValidationRule
      */
     public const RESERVED = [
         'account', 'admin', 'api', 'bag', 'build', 'cart', 'checkout', 'filament',
-        'livewire', 'login', 'logout', 'orders', 'password', 'profile', 'register',
+        'livewire', 'login', 'logout', 'orders', 'password', 'profile', 'quick-view', 'register',
         'search', 'storage', 'up',
     ];
 
