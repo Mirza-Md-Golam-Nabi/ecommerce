@@ -38,29 +38,31 @@ Indexes: `(product_id, date)`, `(category_id, date)`.
 
 Area-wise and cancel-reason reports query `orders` directly with indexes (volume is small).
 
-## Freshness
-1. `OrderPlaced`/`OrderChanged` → queued `RefreshDailySummaries` recomputes only affected
-   dates with idempotent `INSERT … ON DUPLICATE KEY UPDATE`.
-2. Nightly `reports:rebuild --days=3` safety net.
-3. Dashboard "today" widgets query raw tables, cached 5 min.
+## Freshness (implemented)
+1. `Order::saved` and `Customer::created` dispatch the queued job `RefreshDailySummaries` (after
+   commit) for the affected days: placement day + current/previous delivery day. The job is
+   `ShouldBeUniqueUntilProcessing`, so many saves in one request queue one job.
+2. `App\Services\Reports\DailySummaryBuilder::rebuild($day)` recomputes one day from raw orders
+   (delete + insert in a transaction — idempotent, works on MySQL and SQLite).
+3. Nightly 02:00 `reports:rebuild --days=3` safety net (`routes/console.php`). Manual:
+   `php artisan reports:rebuild --from=2026-11-01 [--to=…]` or `--days=N`.
+4. **A queue worker must run** (`composer run dev` starts one; production: Supervisor `queue:work`).
+5. Days are local days: app timezone is `Asia/Dhaka` (D-032).
 
-## Reports (Filament → "রিপোর্ট" group)
+## Reports (Filament)
 
-**Phase 1**
-- Dashboard: today/7d/30d revenue, profit, orders by status, pending count, today's purchase list size.
-- Sales over time (day/week/month).
-- Profit report (revenue, cost, profit, margin, estimated badge).
-- Top products (qty / revenue / profit).
-- **Unavailable products report:** how often each product was unavailable, lost value → supplier/market decisions.
-- Order status & cancel-reason breakdown.
+**Done (Phase 4)**
+- Main dashboard: today's sales/profit, month sales/profit/margin with 14-day sparklines, open pipeline
+  (pending → link to orders, to-buy → purchase list, out for delivery), 30-day revenue/profit chart.
+- Reports page (`/admin/reports`, group "রিপোর্ট"), filters: from / until / group by day-week-month:
+  headline stats (revenue, profit + margin + estimated-cost warning, delivered/placed + cancel rate,
+  average order, lost sales, cost), revenue/profit chart, sales by period, top products,
+  **unavailable products**, category sales, **area sales** ("অন্যান্য" texts flagged), cancel reasons.
 
-**Phase 2**
-- Category-wise sales/profit.
-- **Area-wise** orders & revenue, incl. top "অন্যান্য" texts (to promote into real areas).
+**Later**
 - Customer report: top, new vs returning, high cancel ratio.
 - Price vs actual cost drift per product (estimated_cost accuracy).
-
-**Phase 3**
 - Hour/day heatmap, expenses & net profit, CSV export.
 
-Report classes live in `app/Services/Reports`, return arrays/DTOs, used by Filament pages & widgets.
+Report classes live in `app/Services/Reports` (`SalesReport`, `ProductReport`, `OrderReport`, `DateRange`),
+return arrays, and are used by widgets in `app/Filament/Widgets` (`Reports/` = report page only).

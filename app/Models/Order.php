@@ -6,6 +6,7 @@ use App\Enums\CancelReason;
 use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Jobs\RefreshDailySummaries;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -78,6 +79,29 @@ class Order extends Model
             'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (Order $order): void {
+            RefreshDailySummaries::dispatch($order->reportDates())->afterCommit();
+        });
+    }
+
+    /**
+     * Report days affected by this order: placement day and (previous/current) delivery day.
+     *
+     * @return list<string>
+     */
+    public function reportDates(): array
+    {
+        $originalDelivered = $this->getOriginal('delivered_at');
+
+        return array_values(array_unique(array_filter([
+            $this->placed_at?->toDateString(),
+            $this->delivered_at?->toDateString(),
+            $originalDelivered instanceof Carbon ? $originalDelivered->toDateString() : null,
+        ])));
     }
 
     /**

@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 /* Deletes prunable models, e.g. guest bags untouched for 30 days (App\Models\Cart::prunable()). */
 Schedule::command('model:prune')->daily();
+
+/* Safety net for the event-driven report summaries (docs/04-reporting.md "Freshness"). */
+Schedule::command('reports:rebuild --days=3')->dailyAt('02:00');

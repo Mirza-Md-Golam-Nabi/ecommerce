@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\RefreshDailySummaries;
 use Database\Factories\CustomerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -44,6 +45,13 @@ class Customer extends Authenticatable
             'cancelled_count' => 'integer',
             'last_order_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (Customer $customer): void {
+            RefreshDailySummaries::dispatch([$customer->created_at->toDateString()])->afterCommit();
+        });
     }
 
     /**

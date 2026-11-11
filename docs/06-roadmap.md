@@ -44,9 +44,10 @@ Mark `[x]` when done. Each item = one branch/PR with Pest tests.
 - Note: Filament tests use `callTableAction`/`assertTableActionHidden` (deprecated in v5 but working) — migrate to `TestAction` when convenient.
 
 ## Phase 4 — Reports
-- [ ] Summary tables, listener, `reports:rebuild`
-- [ ] Dashboard + Phase-1 reports (see 04-reporting.md)
-- [ ] Phase-2 reports
+- [x] Summary tables, queued refresh job on order/customer changes, `reports:rebuild` + nightly schedule
+- [x] Timezone `Asia/Dhaka` so daily reports follow local days
+- [x] Dashboard widgets + Reports page (stats, chart, by period, top products, unavailable, categories, areas, cancel reasons)
+- [ ] Customer report, cost-drift report, heatmap, expenses/net profit, CSV export (see 04-reporting.md "Later")
 
 ## Later
 - [ ] Coupons, flash sale / collections, favourites, delivery time slots

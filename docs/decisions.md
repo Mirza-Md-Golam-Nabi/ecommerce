@@ -82,3 +82,12 @@ One step per product in the market; partial purchases are corrected per order on
 
 **D-031 — 2026-11-11 — Admin order actions reload the order page after success.**
 Keeps the summary, items table, history and buttons consistent (they are separate Livewire components).
+
+**D-032 — 2026-11-11 — App timezone is `Asia/Dhaka` (`APP_TIMEZONE`).**
+Daily reports must follow local days; with UTC, orders between 00:00 and 06:00 would land on the previous day. Changed before any production data existed.
+
+**D-033 — 2026-11-11 — Report summaries are refreshed by a queued job dispatched from `Order::saved` / `Customer::created`, rebuilding whole days (delete + insert).**
+Model events catch every change path (actions, admin, seeders) without wiring events into each action; whole-day rebuilds are simple, idempotent and portable. Nightly rebuild is the safety net.
+
+**D-034 — 2026-11-11 — `User` implements `FilamentUser` (`canAccessPanel` → admin panel).**
+Without it Filament blocks every admin outside the local environment — the admin could not log in in production.
