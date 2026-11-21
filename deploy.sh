@@ -61,6 +61,18 @@ if [ ! -f .env ]; then
     echo "✅ .env created"
 fi
 
+# Send every request to public/ when the domain points at the project root
+if [ ! -f .htaccess ]; then
+    cat > .htaccess <<'EOF'
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+EOF
+    echo "✅ .htaccess created"
+fi
+
 $PHP artisan down
 echo "✅ Maintenance mode ON"
 
