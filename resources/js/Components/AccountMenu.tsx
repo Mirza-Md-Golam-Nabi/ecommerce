@@ -12,7 +12,7 @@ export default function AccountMenu() {
         return (
             <Link
                 href="/login"
-                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold whitespace-nowrap hover:bg-white/10"
+                className="flex items-center gap-2 rounded-xl px-2 py-2 text-sm font-semibold whitespace-nowrap hover:bg-white/10 sm:px-3"
                 aria-label="লগইন"
             >
                 <UserIcon className="size-5" />
@@ -25,7 +25,7 @@ export default function AccountMenu() {
         <div className="flex items-center gap-1">
             <Link
                 href="/orders"
-                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold whitespace-nowrap hover:bg-white/10"
+                className="flex items-center gap-2 rounded-xl px-2 py-2 text-sm font-semibold whitespace-nowrap hover:bg-white/10 sm:px-3"
                 aria-label="আমার অর্ডার"
             >
                 <UserIcon className="size-5" />

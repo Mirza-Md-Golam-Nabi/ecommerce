@@ -52,6 +52,7 @@
 | Order statuses in progress | `OrderStatus::active()` |
 | Ordered grams / profit of an order | `OrderItem::orderedGrams()`, `Order::grossProfit()` |
 | Storefront product listing order + pages | `Product::forStorefront($sort)` scope, `Product::SORT_OPTIONS`, `ProductCardResource::paginate()` |
+| Related products under a product page | `App\Services\Catalog\RelatedProducts::for()` (deferred `relatedProducts` prop) |
 | After customer login/registration | `App\Actions\Customer\CompleteCustomerLogin` |
 | Margin text | `SalesReport::marginLabel()` |
 | Filament money input / column / entry | `Filament\Forms\MoneyInput`, `Filament\Tables\MoneyColumn`, `Filament\Infolists\MoneyEntry` |

@@ -80,9 +80,9 @@ export default function CategorySidebar({ onNavigate }: { onNavigate?: () => voi
                                     }
                                     onNavigate?.();
                                 }}
-                                className={`flex min-w-0 flex-1 items-center gap-2.5 px-3 py-2 ${depth === 0 ? 'font-semibold' : 'text-[0.95rem]'}`}
+                                className={`flex min-w-0 flex-1 items-center gap-2 px-2.5 py-2 sm:gap-2.5 sm:px-3 ${depth === 0 ? 'font-semibold' : 'text-[0.95em]'}`}
                             >
-                                {depth === 0 && <span className="text-lg">{node.icon ?? '•'}</span>}
+                                {depth === 0 && <span className="text-base sm:text-lg">{node.icon ?? '•'}</span>}
                                 <span className="truncate">{node.name}</span>
                             </Link>
                             {hasChildren && (

@@ -7,6 +7,7 @@ use App\Http\Resources\ProductCardResource;
 use App\Http\Resources\ProductDetailResource;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTree;
+use App\Services\Catalog\RelatedProducts;
 use App\Support\Media;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,7 @@ class CatalogController extends Controller
         return Inertia::render('Product', [
             'product' => (new ProductDetailResource($product))->resolve(),
             'breadcrumbs' => $this->breadcrumbs($product->category_id, $tree),
+            'relatedProducts' => Inertia::defer(fn (): array => app(RelatedProducts::class)->for($product)),
         ]);
     }
 

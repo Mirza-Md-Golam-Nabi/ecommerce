@@ -32,7 +32,7 @@ export default function StoreLayout({ children }: { children: ReactNode }) {
                             <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 overflow-y-auto border-r border-line bg-card px-2 py-3 lg:block">
                                 <CategorySidebar />
                             </aside>
-                            <main className="min-w-0 flex-1 px-4 pt-5 pb-24 lg:px-6 lg:pr-24 lg:pb-10">
+                            <main className="min-w-0 flex-1 px-3 pt-3 pb-24 sm:px-4 sm:pt-5 lg:px-6 lg:pr-24 lg:pb-10">
                                 <div className="mx-auto max-w-[1400px]">{children}</div>
                             </main>
                         </div>
@@ -43,11 +43,11 @@ export default function StoreLayout({ children }: { children: ReactNode }) {
                                 className={`absolute inset-0 bg-ink/50 transition-opacity ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
                             />
                             <div
-                                className={`absolute top-0 left-0 h-full w-80 max-w-[85vw] overflow-y-auto bg-card p-4 shadow-2xl transition-transform duration-300 ${
+                                className={`absolute top-0 left-0 h-full w-72 max-w-[85vw] overflow-y-auto bg-card p-3 text-sm shadow-2xl sm:w-80 sm:p-4 sm:text-base transition-transform duration-300 ${
                                     menuOpen ? 'translate-x-0' : '-translate-x-full'
                                 }`}
                             >
-                                <div className="mb-3 flex justify-end">
+                                <div className="mb-2 flex justify-end">
                                     <button
                                         type="button"
                                         onClick={() => setMenuOpen(false)}

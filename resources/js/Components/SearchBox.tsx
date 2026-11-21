@@ -26,14 +26,14 @@ export default function SearchBox({ className = '' }: { className?: string }) {
                 onChange={(event) => setTerm(event.target.value)}
                 placeholder="পণ্য খুঁজুন… যেমন: চাল, ডিম, onion"
                 aria-label="পণ্য খুঁজুন"
-                className="h-11 w-full rounded-full border-0 bg-card pr-14 pl-5 text-ink shadow-inner ring-2 ring-transparent outline-none placeholder:text-muted focus:ring-accent"
+                className="h-10 w-full rounded-full border-0 bg-card pr-12 pl-4 text-base placeholder:text-sm sm:h-11 sm:pr-14 sm:pl-5 text-ink shadow-inner ring-2 ring-transparent outline-none placeholder:text-muted focus:ring-accent"
             />
             <button
                 type="submit"
                 aria-label="খুঁজুন"
-                className="absolute top-1 right-1 grid size-9 place-items-center rounded-full bg-accent text-accent-fg transition hover:brightness-105"
+                className="absolute top-1 right-1 grid size-8 sm:size-9 place-items-center rounded-full bg-accent text-accent-fg transition hover:brightness-105"
             >
-                <SearchIcon className="size-5" />
+                <SearchIcon className="size-4 sm:size-5" />
             </button>
         </form>
     );

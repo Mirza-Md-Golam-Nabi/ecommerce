@@ -1,13 +1,48 @@
-import { Head } from '@inertiajs/react';
+import { Deferred, Head } from '@inertiajs/react';
 
 import AddToBagControl from '@/Components/AddToBagControl';
 import Breadcrumbs from '@/Components/Breadcrumbs';
 import Price from '@/Components/Price';
+import ProductCard from '@/Components/ProductCard';
 import ProductGallery from '@/Components/ProductGallery';
+import { ProductCardSkeleton, productGridClasses } from '@/Components/ProductGrid';
 import WeightedPriceNote from '@/Components/WeightedPriceNote';
-import type { Breadcrumb, ProductDetail } from '@/types';
+import type { Breadcrumb, ProductCard as ProductCardData, ProductDetail } from '@/types';
 
-export default function Product({ product, breadcrumbs }: { product: ProductDetail; breadcrumbs: Breadcrumb[] }) {
+interface ProductPageProps {
+    product: ProductDetail;
+    breadcrumbs: Breadcrumb[];
+    /** Deferred: loaded right after the page renders. */
+    relatedProducts?: ProductCardData[];
+}
+
+function RelatedProductsHeading() {
+    return (
+        <div className="mb-5">
+            <h2 className="text-2xl font-bold text-ink">সম্পর্কিত পণ্য</h2>
+            <div className="mt-2 h-1 w-16 rounded-full bg-accent" />
+        </div>
+    );
+}
+
+function RelatedProducts({ products }: { products: ProductCardData[] | undefined }) {
+    if (!products || products.length === 0) {
+        return null;
+    }
+
+    return (
+        <section className="mt-10">
+            <RelatedProductsHeading />
+            <div className={productGridClasses}>
+                {products.map((related) => (
+                    <ProductCard key={related.id} product={related} />
+                ))}
+            </div>
+        </section>
+    );
+}
+
+export default function Product({ product, breadcrumbs, relatedProducts }: ProductPageProps) {
     return (
         <>
             <Head title={product.name} />
@@ -47,6 +82,22 @@ export default function Product({ product, breadcrumbs }: { product: ProductDeta
                     )}
                 </div>
             </div>
+
+            <Deferred
+                data="relatedProducts"
+                fallback={
+                    <section className="mt-10">
+                        <RelatedProductsHeading />
+                        <div className={productGridClasses}>
+                            {Array.from({ length: 5 }, (_, index) => (
+                                <ProductCardSkeleton key={index} />
+                            ))}
+                        </div>
+                    </section>
+                }
+            >
+                <RelatedProducts products={relatedProducts} />
+            </Deferred>
         </>
     );
 }

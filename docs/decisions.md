@@ -94,3 +94,9 @@ Without it Filament blocks every admin outside the local environment — the adm
 
 **D-035 — 2026-11-11 — Strict DRY: shared logic, markup and constants live in central helpers listed in `docs/07-conventions.md` ("Central helper registry"); backend/frontend shared values are sent from the server as props.**
 Requested by the owner; one place to change behaviour, fewer inconsistencies.
+
+**D-036 — 2026-11-11 — Admin login form is pre-filled with the demo admin (`admin@example.com` / `password`) only when `APP_ENV=local`.**
+Faster local testing; custom `App\Filament\Pages\Auth\Login` uses `app()->isLocal()`, so production (and any other env) shows an empty form.
+
+**D-037 — 2026-11-11 — Product page shows up to 10 related products (deferred prop): same category first, then visible sibling categories; available, then best-selling first.**
+Encourages browsing more products without slowing the product page itself; siblings fill the row when a category is small.

@@ -24,3 +24,23 @@
     --color-muted: var(--c-muted);
     --color-line: var(--c-border);
 }
+
+/*
+ * Mobile basics: no grey tap flash, no auto-enlarged text in landscape, and a utility
+ * that hides scrollbars on horizontally scrolling rows (sort chips, breadcrumbs).
+ */
+@layer base {
+    html {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+}
+
+@utility scrollbar-none {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

@@ -2,7 +2,8 @@
 <html lang="bn">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <meta name="theme-color" content="{{ \App\Support\Theme::current()->colors['primary'] ?? '' }}">
 
         <title inertia>{{ app(\App\Settings\StoreSettings::class)->storeName() }}</title>
 
