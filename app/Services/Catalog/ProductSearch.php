@@ -3,12 +3,12 @@
 namespace App\Services\Catalog;
 
 use App\Models\Product;
+use App\Support\FullTextSearch;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Storefront product search over `name` (Bangla) and `search_keywords` (English/Banglish).
- * MySQL uses the ngram FULLTEXT index; other drivers (SQLite in tests) and 1-character
+ * MySQL uses the ngram FULLTEXT index; MariaDB, SQLite (tests) and 1-character
  * terms fall back to LIKE, which is fine for ~1,000 products.
  */
 final class ProductSearch
@@ -26,7 +26,7 @@ final class ProductSearch
             ->active()
             ->whereIn('category_id', $this->tree->visibleIds());
 
-        if (DB::getDriverName() === 'mysql' && mb_strlen($term) >= 2) {
+        if (FullTextSearch::supportsNgram() && mb_strlen($term) >= 2) {
             return $query->whereFullText(['name', 'search_keywords'], $term);
         }
 

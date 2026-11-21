@@ -48,6 +48,7 @@
 | Phone normalize / validate | `App\Support\PhoneNumber`, rule `BangladeshiPhone`, request trait `Http\Requests\Concerns\NormalizesPhone` |
 | Slug format + uniqueness | `App\Rules\UniqueStoreSlug` (`PATTERN` for routes, `REGEX` for forms, `RESERVED`) |
 | Image URL | `App\Support\Media::url()` |
+| ngram FULLTEXT available? (MySQL yes, MariaDB/SQLite no) | `App\Support\FullTextSearch::supportsNgram()` |
 | Theme colors (any color in PHP/Blade/charts) | `App\Support\Theme::current()->colors` — never hard-coded hex |
 | Order statuses in progress | `OrderStatus::active()` |
 | Ordered grams / profit of an order | `OrderItem::orderedGrams()`, `Order::grossProfit()` |

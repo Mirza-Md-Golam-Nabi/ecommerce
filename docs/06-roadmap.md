@@ -25,7 +25,7 @@ Mark `[x]` when done. Each item = one branch/PR with Pest tests.
 - [x] Home: hero + popular categories grid
 - [x] `/{slug}` resolver: category (tiles or product grid with sort + infinite scroll) / product page
 - [x] ProductCard with qty stepper; quick-view modal
-- [x] Search (FULLTEXT ngram on MySQL, LIKE fallback)
+- [x] Search (FULLTEXT ngram on MySQL, LIKE fallback on MariaDB / 1-char)
 - [x] Guest bag (cookie) + BagPanel (optimistic, debounced)
 
 ## Phase 3A — Customers & checkout (storefront)

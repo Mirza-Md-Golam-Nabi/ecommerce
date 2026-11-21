@@ -8,7 +8,7 @@ Scale target now: ~1,000 products, one city. Design for 10× without rewrites.
 - Every listing filter/sort hits an index (see 02-database.md); check with `EXPLAIN`.
 - Category tree: one cached structure (`CategoryTree`), never queried per request.
   Descendants via materialized `path`, breadcrumb from cached tree (zero queries).
-- Search: FULLTEXT (ngram) on `name, search_keywords`; fallback `LIKE` for 1-char queries.
+- Search: FULLTEXT (ngram) on `name, search_keywords` on MySQL; `LIKE` for 1-char queries and on MariaDB (no ngram parser).
 - Paginate product grids (`simplePaginate` / infinite scroll with Inertia `WhenVisible`/merge props
   — verify feature in installed Inertia version).
 - Reports read summary tables only.

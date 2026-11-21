@@ -100,3 +100,6 @@ Faster local testing; custom `App\Filament\Pages\Auth\Login` uses `app()->isLoca
 
 **D-037 — 2026-11-11 — Product page shows up to 10 related products (deferred prop): same category first, then visible sibling categories; available, then best-selling first.**
 Encourages browsing more products without slowing the product page itself; siblings fill the row when a category is small.
+
+**D-038 — 2026-11-21 — ngram FULLTEXT index and search are used only on real MySQL (`App\Support\FullTextSearch::supportsNgram()`); MariaDB falls back to `LIKE`.**
+The live cPanel server runs MariaDB 11.4, which has no ngram parser, so the products migration failed. Laravel reports MariaDB as driver `mysql`, so the check uses `isMaria()`. `LIKE` is fast enough for ~1,000 products and still matches Bangla partial words.

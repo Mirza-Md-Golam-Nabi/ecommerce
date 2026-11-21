@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\FullTextSearch;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,7 @@ return new class extends Migration
             $table->index(['is_active', 'total_sold']);
         });
 
-        if (DB::getDriverName() === 'mysql') {
+        if (FullTextSearch::supportsNgram()) {
             DB::statement('ALTER TABLE products ADD FULLTEXT INDEX products_search_fulltext (name, search_keywords) WITH PARSER ngram');
         }
     }
